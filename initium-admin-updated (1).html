@@ -1,0 +1,3119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Initium Admin — Control Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════ ROOT ══════════════════════ */
+:root {
+  --bg:      #080B14;
+  --sidebar: #0A0E1C;
+  --card:    #111828;
+  --card2:   #161D30;
+  --input:   #0E1422;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --blue:    #5B8CF5;
+  --blue2:   #7AAAF8;
+  --gold:    #D4A843;
+  --gold2:   #F0C866;
+  --green:   #4ECB87;
+  --red:     #E05C5C;
+  --amber:   #F0A340;
+  --purple:  #8B6CF5;
+  --text:    #DDE3F0;
+  --muted:   #5C6480;
+  --muted2:  #8892A8;
+  --accent:  rgba(91,140,245,0.12);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  font-size: 13.5px;
+  overflow: hidden;
+}
+
+/* ══════════════════════ LOGIN SCREEN ══════════════════════ */
+#login-screen {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+  flex-direction: column;
+}
+#login-screen::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 30% 40%, rgba(91,140,245,0.08), transparent 65%),
+    radial-gradient(ellipse 50% 60% at 80% 70%, rgba(212,168,67,0.06), transparent 65%);
+  pointer-events: none;
+}
+.login-box {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  padding: 3rem 3rem 2.5rem;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  animation: loginReveal .5s ease both;
+}
+@keyframes loginReveal {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.login-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--blue), var(--gold), transparent);
+}
+.login-logo {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 2.5rem;
+}
+.login-hexmark {
+  width: 42px; height: 42px;
+  border: 1.5px solid var(--gold);
+  display: grid; place-items: center;
+  position: relative;
+  transform: rotate(45deg);
+}
+.login-hexmark span {
+  transform: rotate(-45deg);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px; color: var(--gold); font-weight: 600;
+}
+.login-brand { line-height: 1.15; }
+.login-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px; font-weight: 400;
+  letter-spacing: 3px; text-transform: uppercase;
+}
+.login-tag {
+  font-size: 8px; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--blue); font-weight: 600;
+}
+.login-h { font-size: 1rem; font-weight: 700; margin-bottom: .3rem; }
+.login-sub { font-size: .8rem; color: var(--muted2); margin-bottom: 2rem; line-height: 1.5; }
+.l-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
+.l-label { font-size: 8.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--blue); font-weight: 600; }
+.l-input {
+  background: var(--input); border: 1px solid var(--border2);
+  color: var(--text); font-family: 'Syne', sans-serif; font-size: .88rem;
+  padding: 11px 14px; outline: none; transition: border-color .2s; width: 100%;
+}
+.l-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(91,140,245,0.12); }
+.l-input::placeholder { color: var(--muted); }
+.l-btn {
+  width: 100%; background: var(--blue); border: none;
+  color: #fff; font-family: 'Syne', sans-serif;
+  font-size: .82rem; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; padding: 13px; cursor: pointer;
+  transition: all .2s; margin-top: .5rem;
+}
+.l-btn:hover { background: var(--blue2); box-shadow: 0 0 30px rgba(91,140,245,0.35); }
+.login-error {
+  display: none; background: rgba(224,92,92,0.1); border: 1px solid rgba(224,92,92,0.25);
+  color: var(--red); font-size: .8rem; padding: .7rem 1rem; margin-top: .8rem; text-align: center;
+}
+.login-hint {
+  font-size: .75rem; color: var(--muted); text-align: center;
+  margin-top: 1.5rem; letter-spacing: .5px;
+}
+.login-hint code { color: var(--gold); background: rgba(212,168,67,0.08); padding: 2px 6px; font-family: 'DM Mono', monospace; }
+
+/* ══════════════════════ LAYOUT ══════════════════════ */
+#app { display: none; height: 100vh; overflow: hidden; }
+#app.visible { display: flex; }
+
+/* ══════════════════════ SIDEBAR ══════════════════════ */
+.sidebar {
+  width: 240px; min-width: 240px;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.sidebar-logo {
+  padding: 1.5rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.sb-hexmark {
+  width: 30px; height: 30px; border: 1px solid var(--gold);
+  display: grid; place-items: center;
+  font-family: 'Cormorant Garamond', serif; font-size: 14px;
+  color: var(--gold); transform: rotate(45deg); flex-shrink: 0;
+}
+.sb-hexmark span { transform: rotate(-45deg); }
+.sb-brand-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px; letter-spacing: 2.5px;
+  text-transform: uppercase; line-height: 1.1;
+}
+.sb-brand-tag { font-size: 7.5px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--blue); font-weight: 600; }
+
+.sidebar-nav {
+  flex: 1; overflow-y: auto; padding: 1rem 0;
+}
+.sidebar-nav::-webkit-scrollbar { width: 2px; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: var(--border2); }
+.nav-section-label {
+  font-size: 7.5px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--muted); font-weight: 600;
+  padding: 1.2rem 1.4rem .4rem;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: .7rem 1.4rem; cursor: pointer;
+  color: var(--muted2); font-size: .82rem; font-weight: 500;
+  transition: all .18s; border-left: 2px solid transparent;
+  position: relative;
+}
+.nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+.nav-item.active {
+  color: var(--blue2); background: rgba(91,140,245,0.08);
+  border-left-color: var(--blue);
+}
+.nav-icon { font-size: 13px; width: 20px; text-align: center; flex-shrink: 0; opacity: 0.85; }
+.nav-badge {
+  margin-left: auto; background: var(--blue); color: #fff;
+  font-size: 9px; font-weight: 700; padding: 2px 6px;
+  border-radius: 2px; font-family: 'DM Mono', monospace;
+}
+.nav-badge.gold { background: var(--gold); color: #080B14; }
+.nav-badge.red  { background: var(--red); }
+
+.sidebar-footer {
+  padding: 1rem 1.4rem;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.admin-avatar {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  display: grid; place-items: center;
+  font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.admin-name { font-size: .8rem; font-weight: 600; }
+.admin-role { font-size: .7rem; color: var(--muted2); }
+.logout-btn {
+  margin-left: auto; background: none; border: none;
+  color: var(--muted); cursor: pointer; font-size: 15px;
+  transition: color .2s;
+}
+.logout-btn:hover { color: var(--red); }
+
+/* ══════════════════════ MAIN CONTENT ══════════════════════ */
+.main {
+  flex: 1; display: flex; flex-direction: column; overflow: hidden;
+}
+
+/* Top bar */
+.topbar {
+  background: var(--sidebar); border-bottom: 1px solid var(--border);
+  padding: 0 2rem; height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.topbar-title { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: .7rem; }
+.topbar-icon { font-size: 18px; }
+.topbar-right { display: flex; align-items: center; gap: 1rem; }
+.topbar-time { font-family: 'DM Mono', monospace; font-size: .78rem; color: var(--muted2); }
+.live-dot {
+  width: 7px; height: 7px; background: var(--green); border-radius: 50%;
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse 2s ease infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+.topbar-launch {
+  background: var(--gold); border: none;
+  color: #080B14; font-family: 'Syne', sans-serif;
+  font-size: 9px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; padding: 8px 18px; cursor: pointer;
+  transition: all .2s; display: flex; align-items: center; gap: 6px;
+}
+.topbar-launch:hover { background: var(--gold2); box-shadow: 0 0 20px rgba(212,168,67,0.3); }
+
+/* Content area */
+.content {
+  flex: 1; overflow-y: auto; padding: 2rem;
+}
+.content::-webkit-scrollbar { width: 3px; }
+.content::-webkit-scrollbar-thumb { background: var(--border2); }
+
+/* ══════════════════════ SECTIONS (hidden/shown) ══════════════════════ */
+.section { display: none; }
+.section.active { display: block; }
+
+/* ══════════════════════ CARDS / LAYOUT ══════════════════════ */
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  padding: 1.8rem; margin-bottom: 1.5rem;
+}
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.5rem; padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.card-title { font-size: .88rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.card-subtitle { font-size: .76rem; color: var(--muted2); margin-top: 2px; }
+
+/* KPI row */
+.kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.2rem; margin-bottom: 1.5rem; }
+.kpi {
+  background: var(--card); border: 1px solid var(--border);
+  padding: 1.4rem 1.6rem; position: relative; overflow: hidden;
+}
+.kpi::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.kpi.blue::before { background: var(--blue); }
+.kpi.gold::before { background: var(--gold); }
+.kpi.green::before { background: var(--green); }
+.kpi.purple::before { background: var(--purple); }
+.kpi-icon { font-size: 1.2rem; margin-bottom: .6rem; opacity: .5; letter-spacing: 0; }
+.kpi-val { font-family: 'DM Mono', monospace; font-size: 1.8rem; font-weight: 400; line-height: 1; margin-bottom: .3rem; }
+.kpi.blue .kpi-val   { color: var(--blue2); }
+.kpi.gold .kpi-val   { color: var(--gold2); }
+.kpi.green .kpi-val  { color: var(--green); }
+.kpi.purple .kpi-val { color: #A990F8; }
+.kpi-lbl { font-size: .72rem; color: var(--muted2); letter-spacing: 1px; text-transform: uppercase; }
+
+/* ══════════════════════ TABLES ══════════════════════ */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  padding: .7rem 1rem; text-align: left;
+  font-size: 8.5px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--blue2); font-weight: 600;
+  border-bottom: 1px solid var(--border2); background: rgba(91,140,245,0.04);
+}
+.data-table td {
+  padding: .85rem 1rem; border-bottom: 1px solid var(--border);
+  font-size: .82rem; color: var(--muted2);
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tbody tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
+.data-table tbody tr { transition: background .15s; }
+.sym-badge {
+  font-family: 'DM Mono', monospace; font-size: .85rem;
+  color: var(--text); font-weight: 500;
+  background: rgba(91,140,245,0.1); padding: 3px 8px;
+  border: 1px solid rgba(91,140,245,0.2);
+}
+.val-green { color: var(--green); font-family: 'DM Mono', monospace; }
+.val-red   { color: var(--red);   font-family: 'DM Mono', monospace; }
+.val-gold  { color: var(--gold);  font-family: 'DM Mono', monospace; }
+
+/* ══════════════════════ BUTTONS ══════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: none; cursor: pointer;
+  font-family: 'Syne', sans-serif; font-weight: 600;
+  font-size: .78rem; letter-spacing: 1px;
+  padding: 8px 16px; transition: all .18s;
+}
+.btn-blue  { background: var(--blue);  color: #fff; }
+.btn-blue:hover  { background: var(--blue2); box-shadow: 0 0 20px rgba(91,140,245,0.35); }
+.btn-gold  { background: var(--gold);  color: #080B14; font-weight: 700; }
+.btn-gold:hover  { background: var(--gold2); }
+.btn-red   { background: rgba(224,92,92,0.15); color: var(--red); border: 1px solid rgba(224,92,92,0.25); }
+.btn-red:hover   { background: rgba(224,92,92,0.25); }
+.btn-ghost { background: none; border: 1px solid var(--border2); color: var(--muted2); }
+.btn-ghost:hover { border-color: var(--blue); color: var(--blue2); }
+.btn-green { background: rgba(78,203,135,0.12); color: var(--green); border: 1px solid rgba(78,203,135,0.25); }
+.btn-green:hover { background: rgba(78,203,135,0.2); }
+.btn-sm    { padding: 5px 12px; font-size: .72rem; }
+.btn-icon  { padding: 6px; }
+
+/* ══════════════════════ FORM CONTROLS ══════════════════════ */
+.f-row { display: grid; gap: 1rem; margin-bottom: 1rem; }
+.f-row.cols2 { grid-template-columns: 1fr 1fr; }
+.f-row.cols3 { grid-template-columns: 1fr 1fr 1fr; }
+.f-group { display: flex; flex-direction: column; gap: 5px; }
+.f-label { font-size: 8px; letter-spacing: 2px; text-transform: uppercase; color: var(--blue2); font-weight: 600; }
+.f-input {
+  background: var(--input); border: 1px solid var(--border2);
+  color: var(--text); font-family: 'Syne', sans-serif; font-size: .84rem;
+  padding: 9px 12px; outline: none; transition: all .2s; width: 100%;
+}
+.f-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(91,140,245,0.1); }
+.f-input::placeholder { color: var(--muted); }
+.f-input option { background: var(--card); }
+.f-select { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235C6480'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+.f-textarea { resize: vertical; min-height: 80px; }
+.f-color {
+  width: 44px; height: 36px; padding: 2px;
+  border: 1px solid var(--border2); background: var(--input); cursor: pointer;
+}
+
+/* ══════════════════════ MODAL ══════════════════════ */
+.modal-bg {
+  display: none; position: fixed; inset: 0;
+  background: rgba(8,11,20,.92); z-index: 5000;
+  place-items: center;
+}
+.modal-bg.open { display: grid; }
+.modal {
+  background: var(--card); border: 1px solid var(--border2);
+  padding: 2rem; width: min(560px,92vw);
+  position: relative; animation: loginReveal .25s ease both;
+  max-height: 90vh; overflow-y: auto;
+}
+.modal::-webkit-scrollbar { width: 2px; }
+.modal::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 2px; background: linear-gradient(90deg, var(--blue), var(--gold));
+}
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+.modal-title { font-size: 1rem; font-weight: 700; }
+.modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.1rem; transition: color .18s; }
+.modal-close:hover { color: var(--red); }
+.modal-footer { display: flex; gap: .8rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+
+/* ══════════════════════ TOGGLE ══════════════════════ */
+.toggle { position: relative; width: 38px; height: 20px; cursor: pointer; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: absolute; inset: 0;
+  background: var(--border2); transition: background .2s;
+  border-radius: 20px;
+}
+.toggle-thumb {
+  position: absolute; top: 2px; left: 2px;
+  width: 16px; height: 16px; background: #fff;
+  border-radius: 50%; transition: transform .2s;
+}
+.toggle input:checked + .toggle-track { background: var(--blue); }
+.toggle input:checked ~ .toggle-thumb { transform: translateX(18px); }
+
+/* ══════════════════════ CONVICTION STARS ══════════════════════ */
+.stars { display: flex; gap: 3px; }
+.star { width: 10px; height: 10px; background: var(--gold); border-radius: 1px; }
+.star.off { background: var(--border2); }
+
+/* ══════════════════════ TOAST ══════════════════════ */
+#toast-wrap {
+  position: fixed; bottom: 2rem; right: 2rem;
+  display: flex; flex-direction: column; gap: .6rem;
+  z-index: 9998; pointer-events: none;
+}
+.toast {
+  background: var(--card2); border: 1px solid var(--border2);
+  padding: .8rem 1.2rem; display: flex; align-items: center; gap: 10px;
+  font-size: .82rem; min-width: 260px; box-shadow: 0 8px 30px rgba(0,0,0,.5);
+  animation: toastIn .3s ease both;
+  pointer-events: auto;
+}
+@keyframes toastIn { from{opacity:0;transform:translateX(20px);} to{opacity:1;transform:translateX(0);} }
+.toast.success { border-left: 3px solid var(--green); }
+.toast.error   { border-left: 3px solid var(--red); }
+.toast.info    { border-left: 3px solid var(--blue); }
+.toast-icon { font-size: 13px; }
+.toast-msg { flex: 1; color: var(--text); }
+
+/* ══════════════════════ TAG PILLS ══════════════════════ */
+.pill {
+  display: inline-flex; padding: 3px 10px;
+  font-size: 9px; font-weight: 600; letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.pill-blue   { background: rgba(91,140,245,0.12); color: var(--blue2); border: 1px solid rgba(91,140,245,0.2); }
+.pill-gold   { background: rgba(212,168,67,0.12); color: var(--gold2); border: 1px solid rgba(212,168,67,0.2); }
+.pill-green  { background: rgba(78,203,135,0.12); color: var(--green); border: 1px solid rgba(78,203,135,0.2); }
+.pill-red    { background: rgba(224,92,92,0.12);  color: var(--red);   border: 1px solid rgba(224,92,92,0.2); }
+.pill-amber  { background: rgba(240,163,64,0.12); color: var(--amber); border: 1px solid rgba(240,163,64,0.2); }
+
+/* ══════════════════════ SECTION HEADERS ══════════════════════ */
+.s-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 1.8rem; gap: 1rem;
+}
+.s-title { font-size: 1.2rem; font-weight: 700; margin-bottom: .2rem; }
+.s-sub { font-size: .8rem; color: var(--muted2); line-height: 1.5; }
+
+/* ══════════════════════ COLOR PREVIEW ══════════════════════ */
+.color-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; }
+.color-item { display: flex; flex-direction: column; gap: .5rem; }
+.color-swatch {
+  height: 50px; border: 1px solid var(--border2); cursor: pointer;
+  transition: transform .2s; position: relative;
+}
+.color-swatch:hover { transform: scale(1.04); }
+.color-input-hidden { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.color-lbl { font-size: .72rem; color: var(--muted2); text-align: center; }
+.color-val { font-family: 'DM Mono', monospace; font-size: .72rem; color: var(--muted); text-align: center; }
+
+/* ══════════════════════ ACTIVITY FEED ══════════════════════ */
+.activity-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: .8rem 0; border-bottom: 1px solid var(--border);
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  flex-shrink: 0; margin-top: 5px;
+}
+.activity-text { font-size: .8rem; color: var(--muted2); line-height: 1.4; }
+.activity-text strong { color: var(--text); }
+.activity-time { font-family: 'DM Mono', monospace; font-size: .7rem; color: var(--muted); margin-left: auto; white-space: nowrap; flex-shrink: 0; }
+
+/* ══════════════════════ RANGE SLIDER ══════════════════════ */
+.range-wrap { display: flex; align-items: center; gap: 12px; }
+input[type=range] {
+  flex: 1; appearance: none; height: 3px;
+  background: var(--border2); outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  appearance: none; width: 14px; height: 14px;
+  background: var(--blue); border-radius: 50%;
+}
+.range-val {
+  font-family: 'DM Mono', monospace; font-size: .8rem;
+  color: var(--blue2); min-width: 36px; text-align: right;
+}
+/* ══════════════════════ ARTICLE EDITOR ══════════════════════ */
+.article-editor {
+  display: flex; flex-direction: column;
+  width: 100vw; height: 100vh;
+  background: var(--bg);
+  animation: loginReveal .2s ease both;
+}
+.ae-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1.5rem; height: 56px; flex-shrink: 0;
+  background: var(--sidebar); border-bottom: 1px solid var(--border2);
+}
+.ae-back {
+  background: none; border: 1px solid var(--border2); color: var(--muted2);
+  font-family: 'Syne', sans-serif; font-size: .78rem; font-weight: 600;
+  padding: 6px 14px; cursor: pointer; transition: all .18s;
+}
+.ae-back:hover { border-color: var(--blue); color: var(--blue2); }
+.ae-header-title { font-size: .88rem; font-weight: 700; color: var(--text); }
+.ae-status {
+  font-size: .72rem; color: var(--muted); letter-spacing: 1px;
+  text-transform: uppercase; font-family: 'DM Mono', monospace;
+}
+.ae-status.saved { color: var(--green); }
+.ae-body {
+  flex: 1; display: flex; overflow: hidden;
+}
+.ae-meta {
+  width: 280px; min-width: 280px;
+  background: var(--sidebar); border-right: 1px solid var(--border);
+  padding: 1.5rem; overflow-y: auto;
+}
+.ae-meta::-webkit-scrollbar { width: 2px; }
+.ae-meta-title {
+  font-size: 8px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--blue2); font-weight: 700; margin-bottom: 1rem;
+}
+.ae-content {
+  flex: 1; display: flex; flex-direction: column; overflow: hidden;
+  background: var(--bg);
+}
+
+/* Toolbar */
+.rte-toolbar {
+  display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+  padding: .7rem 1.5rem; background: var(--card);
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.rte-group { display: flex; gap: 2px; }
+.rte-sep { width: 1px; height: 20px; background: var(--border2); margin: 0 4px; }
+.rte-btn {
+  background: none; border: none; color: var(--muted2);
+  font-family: 'Syne', sans-serif; font-size: .82rem;
+  padding: 5px 10px; cursor: pointer; transition: all .15s;
+  border-radius: 2px; min-width: 32px;
+}
+.rte-btn:hover { background: var(--accent); color: var(--blue2); }
+.rte-btn.active { background: rgba(91,140,245,0.2); color: var(--blue2); }
+.rte-btn.rte-danger { color: var(--muted); }
+.rte-btn.rte-danger:hover { background: rgba(224,92,92,0.1); color: var(--red); }
+
+/* Editable area */
+.rte-area {
+  flex: 1; overflow-y: auto; padding: 3rem 4rem;
+  outline: none; line-height: 1.85;
+  font-family: 'Syne', sans-serif; font-size: .95rem;
+  color: var(--text); caret-color: var(--blue2);
+  max-width: 820px; margin: 0 auto; width: 100%;
+}
+.rte-area::-webkit-scrollbar { width: 3px; }
+.rte-area::-webkit-scrollbar-thumb { background: var(--border2); }
+.rte-area:empty::before {
+  content: attr(data-placeholder);
+  color: var(--muted); pointer-events: none;
+  white-space: pre-line; line-height: 1.85; font-style: italic;
+}
+.rte-area h1 {
+  font-family: 'Cormorant Garamond', serif; font-size: 2rem;
+  font-weight: 400; color: var(--text); margin: 2rem 0 1rem;
+  line-height: 1.2; border-bottom: 1px solid var(--border); padding-bottom: .6rem;
+}
+.rte-area h2 {
+  font-family: 'Cormorant Garamond', serif; font-size: 1.5rem;
+  font-weight: 400; color: var(--text); margin: 1.8rem 0 .8rem;
+}
+.rte-area h3 {
+  font-size: .95rem; font-weight: 700; color: var(--blue2);
+  letter-spacing: 1px; text-transform: uppercase; margin: 1.5rem 0 .6rem;
+}
+.rte-area p { margin-bottom: 1rem; }
+.rte-area blockquote {
+  border-left: 3px solid var(--gold); padding: .8rem 1.5rem;
+  margin: 1.5rem 0; color: var(--muted2); font-style: italic;
+  background: rgba(212,168,67,0.04);
+}
+.rte-area ul, .rte-area ol {
+  padding-left: 1.8rem; margin-bottom: 1rem;
+}
+.rte-area li { margin-bottom: .4rem; }
+.rte-area hr {
+  border: none; border-top: 1px solid var(--border2);
+  margin: 2rem 0;
+}
+.rte-area a { color: var(--blue2); text-decoration: underline; }
+.rte-area strong { color: var(--cream); font-weight: 700; }
+
+.rte-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .6rem 1.5rem; background: var(--card);
+  border-top: 1px solid var(--border); flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ TOAST CONTAINER ═══════════════════ -->
+<div id="toast-wrap"></div>
+
+<!-- ═══════════════════ LOGIN SCREEN ═══════════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo" style="flex-direction:column;align-items:flex-start;gap:6px;">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJkAAACCCAYAAABVTWriAAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAAU5ElEQVR4nO2dS3Acx3nHf909M/uCAIIgKYMkBFEESEkkiiL1oiPJkmVVYle57JKqcs4ltxxSueWQY265pHLILYfc49guu6yDS6U4sURLtCTSYpGiaJICQAAUSRDEc3fn0V8Ou7OERDxmF1gQS/SvihyQmOnp6f731z3dX3+jcKzL3//tO7IwPUWpEJAkCdXI0tX7Hf71P/5bPey8dQLew85AJ3D4icfZc2wAQ0QYhlRjRawKDztbHYMTWQa6u7sRWyaKI5QWSqUisSo97Gx1DE5kGYiiCCUxEsegLJaIUKoPO1sdgxNZJoRczsfkwVpLlGhIHnaeOgcnsgyICAsLCxRyCqUU1rrxfjM4kWVARMjlchhTM18ajcYJLStOZBnwfR+jLNZGJEmCKI0oedjZ6hj0w85AJ2CtJUnqVkwrlBZEnMiy4kTmaDuuu8yCsoAFnPVqBWfJHG3Hiaxl7MPOQMfgROZoO05kjrbjRNYyruiy4koqA0o0SjRaFNRn+t17ZnacyFpBXLE1gystR9txInO0HScyR9txInO0HScyR9txInO0HScyR9txInO0HScyR9txInO0HScyR9txInO0HScyR9txIsuCfGsjr3Ku183gRJYJjQC16AQCWCe0JnAiy4zGuSq2hhOZo+04kWXGdY+t4kTmaDtOZM3iBvxN40TmaDtOZJlwUxYbYcdG9XnzL07IX731GhIugjL87uPPefe9j1YMn6h1c23xL984Jd979WW0WDAe7733f7z3wZ92bGjGHSuyUjFgd3cJFSvwgvp06+ZQzHns6srhGwXaY3dPcdPS7kR2rMh8rfC1YDzA1KInroaI0EyIWN9AwTcYXZ++lWij2e1odqzIiGMkiUmSMiIJZhM7M7ExYmPAEidCVF3cvMQ7kB0rMq0UnhGMCNYIrBFouFlLRmLRWHylwGg8b8cWM7CDRQY1ISgEJWm4zpVRqq4wZev9n10/HoatCVOhdnw49p0rMkmwNkGSiGSdQX9DZBnRGJRVJCSICDbe2QvrO1dkymCMV7Mz2mONcf99RFP73s3aVkxrD63BeAolynWXDzsDDw3xia0GLLLO4reoWk+ZOvsIaw/RxHq1C1QI4mNtvHn57kB2rsjQSN0ifdvxdbXzofZ+sO7pksoxAWV2/NdL3LKSo+04kTnazg7uLgEsSrTzqm4zO9iSLR/sK3Z0UbSZji/Zwb2lhh16am/XI2GT+nsfLdva0d3lD998QX745pt0lfISxzFiNe/9zxn5r3ffa2L2dPu0s//893+Whflp/EBjtCeVsuXv/vFfOn65oKNFZpOIUtEHW8E3igSLbzJfvezn7SG0qLxEzgeRKgpL4G+PfG2UjhaZkQStQiBGo7BQ/3t9ss2NbS1aLKgYIarPxXV09TTo6KdQxCgSIELXl6I1zc6uq23z8QctFkjqIpNHZlm9o0WmxaKI0RKjtKDxUB08Zq5FQahZM41a0/2ok+hokaEsmgRNTO2rRwqV2ZLdr8DtYceoL9JbksbGlUdj80pHi0xJ3RdMJdTsQPMVs/2Mha1nKuFREdl2acStoWotXlH7ozu8Uu4L3jae7VGgs0VWH7CndWObGCnXhFm/DtZ53dSr/Lxa2mmXbZp6qah96VDQAsqa2pLXI0CHP4VB8LCq5rYjaKzK9kiBVgRGIyIEQUC8Rr+p668TVtX9yZReU5Q2KeMbn7AsaO3j+36mPEUmAWrf1zQ2QNts1213OnpMJmn2RWNVc+uPSSLEsSWxIHGCMavP4lprqf1WkWU1XSQh8ItYa7FoFhay7VaSeveo0o+3SkdXT4MOt2T3afZBlPFRfoCXL4D2iG2y+rlN+vhHAovVkDAStPEpFLuazN0jUy1Ah1uy2rukbqlKKlHCYjXCU1CVCKNX75qstU1ticsXukB5JCoiSsjchdfGb2rZz48GHS2y+9QqRq29ffIbeLkSmAK5QgCJJVlDRUmSNFVSkWgSFeDlDOWwSqW6upXcCXS4yFpv7RNTd/j0swv4uZAoEW6MT6567lrjtZX4+s4Mn5z7nCBniG3CfLma8cp0XKnrb5aPhjXrcJG1zpk/XVRn/nQx07me59XmRhvYNU3m7z+5qH7/Sba0l/PtTSrbb6K4NR6NplJHNxlNICvWppOi7a71WnVom1bLo7FE3tEiExFEBK11W1v9fZG1lzAM8X0fYwxaa/L5/Jbct910dHeZxqaz1nZ2a6mjtSZJEuKwjBULXvCws7QpdLTIkihC4gQ8IR0wbx3tsW5KKYIgwEqA1R1dPQ062gD4viHIeRRyOaC5tcuWaeOitTG1eAhKCSIJYVRp2722ko4WWRLFlBeXWFhY2Nobt0loGoiqIUmSoJRqeupku9LRIvN8TS7nUyzWY7JKO12pt6KoBKUUvvHwjXpkArV0dqdvBUkS4jBG0fmDZN/3UbFGJKFarVCtOpGtyMjQAdl/oJ9SIU9iI0gsnuchyepdTOp9YBVo8UBqe49E1bxeraq5vmvtYcTHQ6iW7zH01D66SjmWFqvUehbdlq5MFFgUSvkgmgQPYfO7MoUliiIwliAosKtvLz986Ul5bPfjhNYiSjBW1fcCeIiC2MRAzQetthGlFg6rmaPFcG8x4ncffNqWUe2mi+zksUO8/r3TKFvF9xTaRmAFZWsTWakj3n13LFsTUePfy7ul+4LRWtfnxVRtZlwlGGUhLFPM5anGujFnttkYz8MSUK1agqBIFAtB7rFNv4+mitYa38uBsszcGedv/votMJoklno4Ud04W9T9wPCq4XrevMhi5SO5vfzug083/ZmgDSLT2qKVRanaLiJDTQxKp/G97osgLSBR94WmZOUjVkDXWrFokMQSJQlh1RKJIlfoRRuvcZ/N5N7CIvmcj/FLROJjFczMlRnoK8j4dHnTWr+IYAlYCiMC3+AHBiUREkbk0miNCkDXfehqzpOiatvnRFmUJPVyy37USrNYaV+E7s0fk3kFEh2gVa3yowQ0GqNqITOV1FoggK13bTUrZhsRDFc6JkmMQmOURmmN1gpPK7CCh6aaKJJ6qOHN5h/+6d+2ZH2nYj1ypRJhZYFYKZAQrQTjFwilPj5bbsnqc4NSf+r7x9XLcaVjTECQb9bnLTubLrJyDAuVhHzg4ysP7cUorYnjBJT+hs9UGoHQ1kUGjV89cPSLPtZaqnFMXI3rXaNCa4PSHgJUExDVue8ys2WhiGBjn0LeJ8EjDqsEnq6NB6FWhlAvR01jmXOd8lvraPGZn1/kwJ6iTNxZ2vQGtek18vnFq8wvlgl8CxJjrEUrhbKqIbB00rSx3Jhh4XH5+qHneeRyOYrFIsVikVwux7Vr1wjjhLHR1V12tjv/e+YzfKPpeqzId/btZam8yM2JG8zPz1LI52mMpUTXrf/mDA0shiQxtENgDofD4XA4HA6Hw+FwOBwOh8PhcDgcDofD4XA4HA6Hw+FwpKjBwUEZHh4mDEMKhQILCwuMj48zNjb2gAPbgQMHZGhoCKUUIsLs7Cznzp3bkKPb/v37ZWBggK6uLnzf5+7du3z88ceZ0vzud78rvb29hGFtQ+ydO3f4/PPPH7j2jTfekCRJyOfzxHFMHMfkcjmMMVQqlcazW2sRkcbzpRtT0s0p1WqVDz744IH0R0ZGpKuri0KhgNaamZkZPvnkk3Wf4cCBA7J//3527dqFMQalFLdv3+aPf/xjU2U6PDws/f39GGMIw5CZmRkuXry4YhpPP/209PX1obXG8zyWlpb46KOPNs1Z8bnnnpPdu3cTRRFKKW7cuIE3OjqqRkZGpFAoUCwWmZ2dXVFgABMTE2rPnj0yPDzciDrzzDPPyKVLl1rO5OTkpPJ9X06ePInneXz99deZr52fn2ffvn1orSmVSly7du2Bcw4cOCC9vb1Ya8nn81QqFZIkoVQqUa1W8X2fvr4+KpUKURRhbW0Ln+d5iAhxHDfEl6uHQ/g2S0tLHDp0iMcee4xKpZL5GSYmJlR3d7cMDAwQRRFa66YFBnDlyhX17LPPSldXF7Ozs1y/fn3Vc+fn5xkaGqK7u5s4jkmShMnJSRkfH98UofX397Nr1y4A7t69y7Vr12oO8XNzc/T396O15t69e2smcv78ebV3717p7u6mp6eHF154gUuXLm0oY6Ojo+rFF18UEWFubi7zdbOzsxhjKBaL3Lt3j9HR0QcKKpfLUalUuHjx4oq/B/jJT34iXV1djI2NcebMmRXPOXr0qBw/fnzFfFy9elWNjIyIiDA/P7+iNV2Nubk5jDG1jb1NBkD+djqe5zE/P8/k5OSqCU1MTKgjR45IsVhkcXGRvr4+BgcHGR8fb/neKSdOnJCenh7CMMRay8zMDFB3El9cXGyoenZ2dt3ExsfHCYKAKIool8u88847G44OdvfuXTzP4+rVq5lLenx8XKVdRBRFK55z7do19e6776rVBAYQBAFhGNLX17fqvS5fvqx+9rOfrZpGuVwmiiK6u7uzZh+oVXpqMe/cudPUtctZWFhAKUW5XF733NSaF4tF5ufn2b9/f8v3Xc7AwADW2lqoBd9v7MtoaSfC4uIiSZLgeV4jMMhPf/rTDQlNRDYUbG6rAtU9CqQNcnp6mnw+TxiGnDp1akP1d+zYMcnlcty6dQtjDNVqlTAMgQ1sdwnDkNu3b3P79m1836dUKvH666+3nNF03ONoP+mg/ObNm8RxbXvhk08+uaE0n3rqKcrlMpOTk3ieR5IkDTG3JLI05OStW7f48ssvmZ6eZmFhgYMHD/Lqq6+2pJT0bc7RfpIkQWvN3NwcExMT5HI5crkczzzzTEsVcPDgQSkWi4yNjTW67eWf+mlJZHEcUygUMMYwOTmpLly4gO/7VCoVHn/88ZZMrxPZ1qGUasQW+fDDD5UxhjiOW7ZmR44cYWlpiQsXLijf94miiCC4H2WpJZFZa0mSpPFKPzExoS5duoS1liAIOHz4MMeOHdtSxTwqAeO2gnROzqvH15iensZaS29vL4cOHWq63vbt28etW7cAGmO85bQksnRgt9zyXLx4Ud28eZNKpYLWmuHhYZ588snMGVZKbegVfiPX7jRSK5Zy5coVkiTBWsvhw4ebSuv555+XMAwbE7ppustfxFoSmYhgjHnAepw5c0Z9/fXXhGFIsVhktXmlldioyJJkZ39aphlSkaVCuH79uoqiiEqlQl9fH/v3789sHAYGBr4xtxmGYcNCpislLYksFUMcPxgJ8MMPP1TVapWlpSXy+Txvv/12pgxba9sSW2yn0EwjTa3W8vMvXbpEEASICEeOHMmUTrpSdPny5cb/pXWYxr2FNgVC/c1vfqPS+bMoivjRj37kRvTbnGvXrqn5+Xm01pknlAcHB7l37x7rLUm1zXT8/Oc/V+lbaE9PT8tTG46tY2pqCmMM+XyekydPrllfhw8flu7ubv785z+vm25b+6c//OEPDc+OwcFBTpw44YS2jTl37pwql8uICAcPHlzz3EOHDrGwsMCVK1fW7aPbKrKJiQn16aefUiqVmJub4+TJkwwNDTmhbWPGx8fxfZ9cLsfIyMiqddXb28vkZLZYcG0faV+4cEGNjY2Ry+UIw5ATJ040NbXh2FrOnj2rRIQoihgeHl7xnBdeeEGMMZndkrbkde7MmTNqdnaW27dvUyqVGBkZ2YrbOlpkamoKgEKhsOLk7MDAQFN+f1s2Z/Db3/5W5fN5ZmdnyeVy/PjHP3bWbJty/fp1giBgaWmJoaGhb/zu8OHDYozJNOBP0UDDzTiO40xzLcYYkiRpeinnV7/6lVJKNbxU33rrrYbQtNYPLEdkIc3zRiZj07W8jaSRzjutNHe4Hum3oXp6elq+/65du6hUKlSr63+K2hiDtXZV96jR0VG1sLBALpejq+ubUbGHh4eJ43jVaQvf9xsL8Cka7k+gpYW9HqkoW/Hh+sUvfqE8z8NaS09PDz/4wQ8kzUMrC+SpP/52WFZqNQ+pS8xGHAS01vT09GT6mFmWj4ONj49jrcX3fV588UUBOHTokHR1dfHFF1+sel06Cbu8wen0pukxS0Gls/OtOgp+/PHHjaWHvXv3curUKUkdIJslzfNGVws2Y+201XzMz883LECreJ6HMSaTZ3Fqdde634ULF9TCwgJaawYGBoCazxjAF198seo94jhubL5J0290l80U8vIdPa3w1VdfqfPnz+P7PouLizz77LPk8/mWPCk2Kg7YHK/ajVjU1AsiCIKW3KSGhoakUChw8+bNTOdndRCdmpoijmOCIODll1+WPXv2MDExseY1y3d4pfdoiCz9k7U1LV+baoXLly+rq1ev0tvby8zMDEEQtCSylVb9m2Wt8UkzJEnSUsO7evWqmpmZwRiz7iToShw5cgRjDF9++WWm89MGsdznayU+++wzle4HGBwcJI7jVTfapKQ93PK1UQ01U7t8z+F6pJsE0i6vVc6ePavGx8cbDpCtivbbA81m2eiLA9z/fnir1n1sbIzFxcV0B1jmRE6dOiXFYpFbt25x/fr1TAWY1vdqW/yWMz093fC6yWIpgyBoLMCnItZAY2Nr+qWP9ejq6sIYQ6FQWPfc9Xj//fdVmqlWrEm6PzJLvlfDGNPY7NoqjQJtUeyXL19Wqfvy0aNH+f73vy+Dg4Nriu21116To0ePUq1Wm9qWmG5CbnyMdg2++uorkiRhaWmJ0dHRdc9P0xSRxs8e1PYmpn7ZWSqrWCzied6miAxqi+lvv/22tFJBqbtvPp9v+f5py96oyNIW3yrnz59X09PT8vzzz9Pf3093dzdDQ0OSJAnj4+MsLS2xd+9eBgYGKJVKeJ7H1NQU77//flNdQKlUIp/P89hj639OcWpqSkVRJNZabty4se598vl8Y0yW6kM/99xzkt4sjmMGBgYYGBhYtQWNjIzIE088gbWWYrG4ad4VZ8+epVwuc/DgwczpvfHGG1KtVhuuxC+99FLTeXnllVckHY8qpTh9+nTTaZw+fVrS130R4bXXXpP+/v6WyuXGjRvql7/8pbpw4QJRFNHX18e+ffs4fvw4r7zyCsePH6dUKjEzM8O5c+eaFtjp06elVCqhtWb37t08/fTT6+bz17/+tVpr2iJlaGhIent78X0fz/Po6enJlP6WcvTo0e2VoW3E8ePHpR7zouPK6P8Bs+cUQxLfkxIAAAAASUVORK5CYII=" alt="Initium Asset Management" style="height:52px;width:auto;display:block;" />
+      <div class="login-tag">Admin Control Panel</div>
+    </div>
+    <div class="login-h">Sign In</div>
+    <p class="login-sub">Enter your administrator credentials to access the Initium CMS dashboard.</p>
+    <div class="l-group">
+      <label class="l-label">Username</label>
+      <input class="l-input" id="l-user" type="text" placeholder="admin" autocomplete="username">
+    </div>
+    <div class="l-group">
+      <label class="l-label">Password</label>
+      <input class="l-input" id="l-pass" type="password" placeholder="••••••••••" autocomplete="current-password">
+    </div>
+    <div class="login-error" id="login-error">✕ Invalid credentials. Please try again.</div>
+    <button class="l-btn" onclick="doLogin()">Sign In to Admin Panel</button>
+    <div class="login-hint">Credentials: <code>admin</code> / <code>Initium@2026</code></div>
+  </div>
+</div>
+
+<!-- ═══════════════════ APP SHELL ═══════════════════ -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo" style="padding:1.2rem 1.2rem;display:flex;align-items:center;gap:10px;">
+      <img src="data:image/png;base64,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" alt="Initium Asset Management" style="height:34px;width:auto;display:block;flex-shrink:0;" />
+      <div style="margin-left:2px;">
+        <div class="sb-brand-tag" style="margin-top:0;">Admin Panel</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active" onclick="showSection('dashboard',this)"><span class="nav-icon">▦</span> Dashboard</div>
+
+      <div class="nav-section-label">Market Data</div>
+      <div class="nav-item" onclick="showSection('tickers',this)"><span class="nav-icon">↗</span> Ticker Stocks <span class="nav-badge" id="badge-tickers">15</span></div>
+      <div class="nav-item" onclick="showSection('portfolio',this)"><span class="nav-icon">◈</span> Portfolio Holdings <span class="nav-badge gold" id="badge-holdings">8</span></div>
+      <div class="nav-item" onclick="showSection('allocation',this)"><span class="nav-icon">◑</span> Sector Allocation</div>
+      <div class="nav-item" onclick="showSection('closed',this)"><span class="nav-icon">⊠</span> Closed Positions <span class="nav-badge" id="badge-closed">0</span></div>
+
+      <div class="nav-section-label">Content</div>
+      <div class="nav-item" onclick="showSection('research',this)"><span class="nav-icon">⊞</span> Research Articles <span class="nav-badge" id="badge-research">7</span></div>
+      <div class="nav-item" onclick="showSection('hero',this)"><span class="nav-icon">▣</span> Hero Section</div>
+      <div class="nav-item" onclick="showSection('herochart',this)"><span class="nav-icon">∿</span> Hero Chart</div>
+      <div class="nav-item" onclick="showSection('pagecontent',this)"><span class="nav-icon">▤</span> All Pages Content</div>
+      <div class="nav-item" onclick="showSection('stats',this)"><span class="nav-icon">≡</span> Stats &amp; KPIs</div>
+      <div class="nav-item" onclick="showSection('plans',this)"><span class="nav-icon">◇</span> Subscription Plans</div>
+      <div class="nav-item" onclick="showSection('contact',this)"><span class="nav-icon">◎</span> Contact Info</div>
+
+      <div class="nav-section-label">Settings</div>
+      <div class="nav-item" onclick="showSection('access',this)"><span class="nav-icon">⊗</span> Access Control</div>
+      <div class="nav-item" onclick="showSection('payments',this)"><span class="nav-icon">◇</span> Payments &amp; Stripe</div>
+      <div class="nav-item" onclick="showSection('notifications',this)"><span class="nav-icon">◎</span> Notifications</div>
+      <div class="nav-item" onclick="showSection('theme',this)"><span class="nav-icon">◐</span> Theme &amp; Colors</div>
+      <div class="nav-item" onclick="showSection('site',this)"><span class="nav-icon">⊛</span> Site Settings</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="admin-avatar">A</div>
+      <div>
+        <div class="admin-name">Administrator</div>
+        <div class="admin-role">Super Admin</div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Sign out">⊗</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-title">
+        <span class="topbar-icon" id="topbar-icon">▦</span>
+        <div>
+          <div id="topbar-title-text">Dashboard</div>
+          <div style="font-size:.7rem;color:var(--muted2);font-weight:400;">Initium Asset Management — CMS</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="live-dot" title="Live sync active"></div>
+        <div class="topbar-time" id="topbar-time">—</div>
+        <button class="topbar-launch" onclick="launchSite()">↗ Launch Site</button>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- ═══ DASHBOARD ═══ -->
+      <div class="section active" id="s-dashboard">
+        <div class="s-header">
+          <div>
+            <div class="s-title">Dashboard</div>
+            <div class="s-sub">Overview of all editable content on the Initium website.</div>
+          </div>
+          <button class="btn btn-gold" onclick="saveAll()">↓ Save All Changes</button>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi blue"><div class="kpi-icon">↗</div><div class="kpi-val" id="d-tickers">15</div><div class="kpi-lbl">Ticker Stocks</div></div>
+          <div class="kpi gold"><div class="kpi-icon">◈</div><div class="kpi-val" id="d-holdings">8</div><div class="kpi-lbl">Portfolio Holdings</div></div>
+          <div class="kpi green"><div class="kpi-icon">⊞</div><div class="kpi-val" id="d-articles">7</div><div class="kpi-lbl">Research Articles</div></div>
+          <div class="kpi purple"><div class="kpi-icon">◇</div><div class="kpi-val">3</div><div class="kpi-lbl">Subscription Plans</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">→ Quick Edit</div><div class="card-subtitle">Jump to any section</div></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:.6rem;">
+              <button class="btn btn-ghost" style="justify-content:flex-start;" onclick="showSection('tickers',null)">↗ Edit Ticker Stocks</button>
+              <button class="btn btn-ghost" style="justify-content:flex-start;" onclick="showSection('portfolio',null)">◈ Edit Portfolio Holdings</button>
+              <button class="btn btn-ghost" style="justify-content:flex-start;" onclick="showSection('research',null)">⊞ Edit Research Articles</button>
+              <button class="btn btn-ghost" style="justify-content:flex-start;" onclick="showSection('hero',null)">▣ Edit Hero Content</button>
+              <button class="btn btn-ghost" style="justify-content:flex-start;" onclick="showSection('theme',null)">◐ Edit Theme Colors</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">◷ Recent Activity</div><div class="card-subtitle">Latest admin changes</div></div>
+            </div>
+            <div id="activity-feed">
+              <div class="activity-item"><div class="activity-dot" style="background:var(--green)"></div><div class="activity-text"><strong>Portfolio updated</strong><br>NVDA return changed to +108.6%</div><div class="activity-time">2m ago</div></div>
+              <div class="activity-item"><div class="activity-dot" style="background:var(--blue)"></div><div class="activity-text"><strong>Article added</strong><br>"Defense Tech: NATO Rearmament"</div><div class="activity-time">1h ago</div></div>
+              <div class="activity-item"><div class="activity-dot" style="background:var(--gold)"></div><div class="activity-text"><strong>Hero updated</strong><br>Subtitle text changed</div><div class="activity-time">3h ago</div></div>
+              <div class="activity-item"><div class="activity-dot" style="background:var(--purple)"></div><div class="activity-text"><strong>Theme changed</strong><br>Gold accent color updated</div><div class="activity-time">1d ago</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">◉ Site Status</div></div>
+            <span class="pill pill-green">● Live</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;">
+            <div><div style="font-size:.72rem;color:var(--muted2);margin-bottom:4px;text-transform:uppercase;letter-spacing:1.5px;">Last Saved</div><div style="font-family:'DM Mono',monospace;font-size:.85rem;" id="d-lastsaved">Never</div></div>
+            <div><div style="font-size:.72rem;color:var(--muted2);margin-bottom:4px;text-transform:uppercase;letter-spacing:1.5px;">Storage Used</div><div style="font-family:'DM Mono',monospace;font-size:.85rem;" id="d-storage">0 KB</div></div>
+            <div><div style="font-size:.72rem;color:var(--muted2);margin-bottom:4px;text-transform:uppercase;letter-spacing:1.5px;">Admin Session</div><div style="font-family:'DM Mono',monospace;font-size:.85rem;color:var(--green);">Active</div></div>
+            <div><div style="font-size:.72rem;color:var(--muted2);margin-bottom:4px;text-transform:uppercase;letter-spacing:1.5px;">Version</div><div style="font-family:'DM Mono',monospace;font-size:.85rem;">v2.0.0</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ TICKERS ═══ -->
+      <div class="section" id="s-tickers">
+        <div class="s-header">
+          <div><div class="s-title">↗ Ticker Stocks</div><div class="s-sub">Manage the scrolling market ticker displayed at the top of the website.</div></div>
+          <div style="display:flex;gap:.8rem;">
+            <button class="btn btn-blue" onclick="openTickerModal(null)">＋ Add Ticker</button>
+            <button class="btn btn-gold" onclick="saveTickers()">↓ Save</button>
+          </div>
+        </div>
+        <div class="card">
+          <table class="data-table" id="tickers-table">
+            <thead><tr><th>#</th><th>Symbol</th><th>Change</th><th>Direction</th><th>Actions</th></tr></thead>
+            <tbody id="tickers-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ PORTFOLIO ═══ -->
+      <div class="section" id="s-portfolio">
+        <div class="s-header">
+          <div><div class="s-title">◈ Portfolio Holdings</div><div class="s-sub">Manage all portfolio positions shown on the Portfolio page.</div></div>
+          <div style="display:flex;gap:.8rem;">
+            <button class="btn btn-blue" onclick="openHoldingModal(null)">＋ Add Holding</button>
+            <button class="btn btn-gold" onclick="saveHoldings()">↓ Save</button>
+          </div>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <table class="data-table" id="holdings-table">
+            <thead><tr><th>Ticker</th><th>Company</th><th>Sector</th><th>Avg Cost</th><th>Last Close</th><th>Return</th><th>Conviction</th><th>Actions</th></tr></thead>
+            <tbody id="holdings-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ ALLOCATION ═══ -->
+      <div class="section" id="s-allocation">
+        <div class="s-header">
+          <div><div class="s-title">◑ Sector Allocation</div><div class="s-sub">Edit the portfolio allocation percentages shown in the donut chart.</div></div>
+          <button class="btn btn-gold" onclick="saveAllocation()">↓ Save</button>
+        </div>
+        <div class="card">
+          <div style="margin-bottom:1rem;font-size:.8rem;color:var(--muted2);">→ All percentages must add up to 100%. Currently: <strong id="alloc-total" style="color:var(--green)">0%</strong></div>
+          <div id="alloc-list" style="display:flex;flex-direction:column;gap:1.2rem;"></div>
+          <button class="btn btn-blue" style="margin-top:1.5rem;" onclick="addAllocItem()">＋ Add Sector</button>
+        </div>
+      </div>
+
+      <!-- ═══ RESEARCH ═══ -->
+      <div class="section" id="s-research">
+        <div class="s-header">
+          <div><div class="s-title">⊞ Research Articles</div><div class="s-sub">Manage all research articles displayed on the Research page. Cards flip on hover to reveal excerpts.</div></div>
+          <div style="display:flex;gap:.8rem;">
+            <button class="btn btn-blue" onclick="openArticleModal(null)">＋ Add Article</button>
+            <button class="btn btn-gold" onclick="saveArticles()">↓ Save</button>
+          </div>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <table class="data-table">
+            <thead><tr><th>Category</th><th>Title</th><th>Date</th><th>Read Time</th><th>Actions</th></tr></thead>
+            <tbody id="articles-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ HERO ═══ -->
+      <div class="section" id="s-hero">
+        <div class="s-header">
+          <div><div class="s-title">▣ Hero Section</div><div class="s-sub">Edit the main homepage hero: headline, subtitle, button labels, and eyebrow text.</div></div>
+          <button class="btn btn-gold" onclick="saveHero()">↓ Save Hero</button>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">✒ Hero Content</div></div>
+          <div class="f-row"><div class="f-group"><label class="f-label">Eyebrow Text</label><input class="f-input" id="h-eyebrow" placeholder="Research-Driven Alpha"></div></div>
+          <div class="f-row"><div class="f-group"><label class="f-label">Headline Line 1</label><input class="f-input" id="h-line1" placeholder="Identifying"></div></div>
+          <div class="f-row"><div class="f-group"><label class="f-label">Headline Italic (Highlighted) Word</label><input class="f-input" id="h-italic" placeholder="Mispriced"></div></div>
+          <div class="f-row"><div class="f-group"><label class="f-label">Headline Line 2 (after italic)</label><input class="f-input" id="h-line2" placeholder="Opportunities in"></div></div>
+          <div class="f-row"><div class="f-group"><label class="f-label">Headline Second Italic</label><input class="f-input" id="h-italic2" placeholder="Public Markets"></div></div>
+          <div class="f-row"><div class="f-group"><label class="f-label">Subtitle / Paragraph</label><textarea class="f-input f-textarea" id="h-sub"></textarea></div></div>
+          <div class="f-row cols2">
+            <div class="f-group"><label class="f-label">Primary Button Label</label><input class="f-input" id="h-btn1" placeholder="Explore Portfolio"></div>
+            <div class="f-group"><label class="f-label">Secondary Button Label</label><input class="f-input" id="h-btn2" placeholder="Our Investment Thesis"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">◎ Live Preview</div></div>
+          <div id="hero-preview" style="background:var(--bg);padding:3rem;text-align:center;min-height:160px;position:relative;overflow:hidden;">
+            <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 80%,rgba(212,168,67,0.08),transparent 70%);"></div>
+            <div style="font-size:.7rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;position:relative;" id="prev-eyebrow">Research-Driven Alpha</div>
+            <h1 style="font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:300;line-height:1.15;position:relative;" id="prev-headline">Identifying <em style="background:linear-gradient(135deg,#D4A843,#F0C866);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Mispriced</em><br>Opportunities in <em style="background:linear-gradient(135deg,#D4A843,#F0C866);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Public Markets</em></h1>
+            <p style="color:var(--muted2);font-size:.85rem;margin-top:.8rem;position:relative;" id="prev-sub">Research-driven investing focused on asymmetric opportunities.</p>
+            <div style="display:flex;gap:.8rem;justify-content:center;margin-top:1.2rem;position:relative;">
+              <span style="background:var(--gold);color:#080B14;padding:8px 20px;font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;" id="prev-btn1">Explore Portfolio</span>
+              <span style="border:1px solid rgba(212,168,67,0.2);color:var(--text);padding:8px 20px;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;" id="prev-btn2">Our Investment Thesis</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ STATS ═══ -->
+      <div class="section" id="s-stats">
+        <div class="s-header">
+          <div><div class="s-title">≡ Stats &amp; KPIs</div><div class="s-sub">Edit the animated counter statistics shown below the hero and on the Portfolio page.</div></div>
+          <button class="btn btn-gold" onclick="saveStats()">↓ Save Stats</button>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Hero Page Stats</div></div>
+          <div id="stats-list" style="display:flex;flex-direction:column;gap:1.2rem;"></div>
+          <button class="btn btn-blue" style="margin-top:1.5rem;" onclick="addStat()">＋ Add Stat</button>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Portfolio KPI Strip</div></div>
+          <div id="kpi-list" style="display:flex;flex-direction:column;gap:1.2rem;"></div>
+        </div>
+      </div>
+
+      <!-- ═══ PLANS ═══ -->
+      <div class="section" id="s-plans">
+        <div class="s-header">
+          <div><div class="s-title">◇ Subscription Plans</div><div class="s-sub">Edit plan names, prices, and features for the Subscriptions page.</div></div>
+          <button class="btn btn-gold" onclick="savePlans()">↓ Save Plans</button>
+        </div>
+        <div id="plans-list" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;"></div>
+      </div>
+
+      <!-- ═══ CONTACT ═══ -->
+      <div class="section" id="s-contact">
+        <div class="s-header">
+          <div><div class="s-title">◎ Contact Information</div><div class="s-sub">Edit the contact details shown on the Contact Us page.</div></div>
+          <button class="btn btn-gold" onclick="saveContact()">↓ Save Contact</button>
+        </div>
+        <div class="card">
+          <div class="f-row cols2">
+            <div class="f-group"><label class="f-label">Primary Email</label><input class="f-input" id="c-email" value="contact@initiumtrust.com"></div>
+            <div class="f-group"><label class="f-label">Response Time</label><input class="f-input" id="c-response" value="2–3 Business Days"></div>
+          </div>
+          <div class="f-row"><div class="f-group"><label class="f-label">Confidentiality Statement</label><input class="f-input" id="c-conf" value="All communications handled with full discretion"></div></div>
+          <div class="f-row"><div class="f-group"><label class="f-label">Focus Areas (comma-separated)</label><input class="f-input" id="c-focus" value="Subscription access · Research enquiries · Institutional partnerships"></div></div>
+          <div class="f-row"><div class="f-group"><label class="f-label">Contact Page Subtitle</label><textarea class="f-input f-textarea" id="c-subtitle">For subscription enquiries, research questions, or institutional access requests. We respond within 2–3 business days.</textarea></div></div>
+        </div>
+      </div>
+
+      <!-- ═══ HERO CHART ═══ -->
+      <div class="section" id="s-herochart">
+        <div class="s-header">
+          <div><div class="s-title">∿ Hero Chart</div><div class="s-sub">Edit the animated performance chart shown at the bottom of the homepage hero.</div></div>
+          <button class="btn btn-gold" onclick="saveHeroChart()">↓ Save Chart</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:1.5rem;align-items:start;">
+          <div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">∿ Chart Labels</div></div>
+              <div class="f-row cols2">
+                <div class="f-group"><label class="f-label">Start Date Label</label><input class="f-input" id="ch-start" value="Q1 2023" oninput="previewChart()"></div>
+                <div class="f-group"><label class="f-label">End Date Label</label><input class="f-input" id="ch-end" value="Q1 2026" oninput="previewChart()"></div>
+              </div>
+              <div class="f-row cols2">
+                <div class="f-group"><label class="f-label">Growth % Label (on chart)</label><input class="f-input" id="ch-growth" value="+68%" oninput="previewChart()"></div>
+                <div class="f-group"><label class="f-label">Growth % Position</label>
+                  <select class="f-input f-select" id="ch-pos" onchange="previewChart()">
+                    <option value="mid">Middle of chart</option>
+                    <option value="top">Near the peak</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="card-title">∿ Chart Curve</div></div>
+              <div class="f-group" style="margin-bottom:1.2rem;">
+                <label class="f-label">Chart Style</label>
+                <select class="f-input f-select" id="ch-style" onchange="previewChart()">
+                  <option value="steady">Steady Growth (smooth rise)</option>
+                  <option value="explosive">Explosive Growth (steep end)</option>
+                  <option value="volatile">Volatile with Rally (realistic)</option>
+                  <option value="vshape">V-Shape Recovery</option>
+                  <option value="flat">Flat then Break Out</option>
+                </select>
+              </div>
+              <div style="margin-bottom:1.2rem;">
+                <label class="f-label" style="display:block;margin-bottom:.6rem;">Overall Gain (start → end)</label>
+                <div class="range-wrap">
+                  <input type="range" min="10" max="500" value="180" id="ch-gain" oninput="this.nextElementSibling.textContent='+'+this.value+'%';previewChart()">
+                  <span class="range-val">+180%</span>
+                </div>
+              </div>
+              <div>
+                <label class="f-label" style="display:block;margin-bottom:.6rem;">Volatility / Roughness</label>
+                <div class="range-wrap">
+                  <input type="range" min="0" max="10" value="3" id="ch-vol" oninput="this.nextElementSibling.textContent=this.value;previewChart()">
+                  <span class="range-val">3</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="card-title">◈ Chart Colors</div></div>
+              <div class="f-row cols2">
+                <div class="f-group">
+                  <label class="f-label">Line Color</label>
+                  <div style="display:flex;gap:.5rem;align-items:center;">
+                    <input type="color" class="f-color" id="ch-linecolor" value="#E8C96B" oninput="previewChart()">
+                    <input class="f-input" id="ch-linecolor-hex" value="#E8C96B" style="flex:1;" oninput="document.getElementById('ch-linecolor').value=this.value;previewChart()">
+                  </div>
+                </div>
+                <div class="f-group">
+                  <label class="f-label">End Dot Color</label>
+                  <div style="display:flex;gap:.5rem;align-items:center;">
+                    <input type="color" class="f-color" id="ch-dotcolor" value="#4DFFEF" oninput="previewChart()">
+                    <input class="f-input" id="ch-dotcolor-hex" value="#4DFFEF" style="flex:1;" oninput="document.getElementById('ch-dotcolor').value=this.value;previewChart()">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Preview -->
+          <div class="card" style="position:sticky;top:80px;">
+            <div class="card-header"><div class="card-title">◎ Live Preview</div><span class="pill pill-green" style="font-size:.7rem;">Realtime</span></div>
+            <div style="background:#02020e;padding:1.5rem 1rem 0;border:1px solid var(--border);position:relative;overflow:hidden;min-height:180px;">
+              <svg id="chart-preview-svg" viewBox="0 0 900 200" width="100%" style="display:block;overflow:visible;">
+                <defs>
+                  <linearGradient id="previewArea" x1="0" y1="0" x2="0" y2="1">
+                    <stop id="pAreaStop" offset="0%" stop-color="#E8C96B" stop-opacity=".18"/>
+                    <stop offset="100%" stop-color="#E8C96B" stop-opacity="0"/>
+                  </linearGradient>
+                  <filter id="pglow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                </defs>
+                <line x1="0" y1="60"  x2="900" y2="60"  stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                <line x1="0" y1="120" x2="900" y2="120" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                <line x1="0" y1="180" x2="900" y2="180" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                <path id="preview-area" d="" fill="url(#previewArea)"/>
+                <path id="preview-line" d="" fill="none" stroke="#E8C96B" stroke-width="2.5" filter="url(#pglow)"/>
+                <circle id="preview-dot" cx="900" cy="10" r="5" fill="#4DFFEF" style="filter:drop-shadow(0 0 8px #4DFFEF)"/>
+                <text id="preview-growth" x="550" y="70" fill="rgba(232,201,107,.85)" font-size="12" font-family="DM Mono">+68%</text>
+                <text id="preview-startdate" x="10" y="197" fill="rgba(82,80,106,.7)" font-size="11" font-family="DM Mono">Q1 2023</text>
+                <text id="preview-enddate" x="820" y="197" fill="rgba(82,80,106,.7)" font-size="11" font-family="DM Mono">Q1 2026</text>
+              </svg>
+            </div>
+            <div style="font-size:.72rem;color:var(--muted2);margin-top:.8rem;text-align:center;">Preview reflects exactly what visitors will see</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ ALL PAGES CONTENT ═══ -->
+      <div class="section" id="s-pagecontent">
+        <div class="s-header">
+          <div><div class="s-title">▤ All Pages Content</div><div class="s-sub">Edit every text element across all pages of the website.</div></div>
+          <button class="btn btn-gold" onclick="savePageContent()">↓ Save All</button>
+        </div>
+
+        <!-- TAB NAV -->
+        <div style="display:flex;gap:4px;margin-bottom:1.5rem;flex-wrap:wrap;" id="pc-tabs">
+          <button class="f-btn on" onclick="pcTab(this,'pc-process')"><span>Process Steps</span></button>
+          <button class="f-btn" onclick="pcTab(this,'pc-cards')"><span>Feature Cards</span></button>
+          <button class="f-btn" onclick="pcTab(this,'pc-cta')"><span>CTA Band</span></button>
+          <button class="f-btn" onclick="pcTab(this,'pc-about')"><span>About Page</span></button>
+          <button class="f-btn" onclick="pcTab(this,'pc-principles')"><span>Principles</span></button>
+          <button class="f-btn" onclick="pcTab(this,'pc-footer')"><span>Footer</span></button>
+        </div>
+
+        <!-- PROCESS STEPS -->
+        <div id="pc-process">
+          <div id="steps-editor"></div>
+        </div>
+
+        <!-- FEATURE CARDS -->
+        <div id="pc-cards" style="display:none;">
+          <div id="cards-editor"></div>
+        </div>
+
+        <!-- CTA BAND -->
+        <div id="pc-cta" style="display:none;">
+          <div class="card">
+            <div class="card-header"><div class="card-title">CTA Band (Homepage)</div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">CTA Main Headline</label><input class="f-input" id="cta-title" value="Research-Driven Opportunities in Public Markets"></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">CTA Subtitle</label><input class="f-input" id="cta-sub" value="Explore our latest investment research, portfolio themes, and market views built around asymmetric opportunity."></div></div>
+            <div class="f-row cols2">
+              <div class="f-group"><label class="f-label">Primary Button Label</label><input class="f-input" id="cta-btn1" value="Read Research"></div>
+              <div class="f-group"><label class="f-label">Secondary Button Label</label><input class="f-input" id="cta-btn2" value="Explore Portfolio"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Access Request Form</div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Form Section Title</label><input class="f-input" id="form-title" value="Join Our Exclusive Research Community"></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Form Subtitle</label><input class="f-input" id="form-sub" value="Reserved for qualified institutional investors and serious private investors."></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Form Legal Note</label><textarea class="f-input f-textarea" id="form-note">By submitting you confirm you are a qualified investor and agree to our Terms.</textarea></div></div>
+          </div>
+        </div>
+
+        <!-- ABOUT PAGE -->
+        <div id="pc-about" style="display:none;">
+          <div class="card">
+            <div class="card-header"><div class="card-title">About Page — Main Sections</div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Page Title</label><input class="f-input" id="ab-title" value="Our Investment Philosophy"></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Page Subtitle</label><input class="f-input" id="ab-sub" value="We analyse fundamentally mispriced assets and use market behavior to identify optimal entry points."></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Left Column Headline</label><input class="f-input" id="ab-lefttitle" value="We Find Value Where Others Miss It"></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Pull Quote</label><textarea class="f-input f-textarea" id="ab-quote">The most compelling opportunities arise when strong fundamentals are not yet reflected in price.</textarea></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Paragraph 1</label><textarea class="f-input f-textarea" id="ab-p1">At Initium, we believe public markets remain inefficient in the short-to-medium term. Our edge comes from combining independent research, data-driven conviction, and disciplined risk management.</textarea></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Paragraph 2</label><textarea class="f-input f-textarea" id="ab-p2">We combine fundamental analysis with technical confirmation. Fundamentals determine what we study, while technical analysis guides when an investment might offer favorable potential.</textarea></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Paragraph 3</label><textarea class="f-input f-textarea" id="ab-p3">Short-term price movements are driven by noise and are inherently difficult to predict. Over longer time horizons, fundamentals prevail.</textarea></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Right Column Headline</label><input class="f-input" id="ab-righttitle" value="What We Focus On"></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Legal / Disclaimer Notice</label><textarea class="f-input f-textarea" id="ab-legal" style="min-height:80px;">Initium conducts proprietary investment research and manages only its own corporate capital. The company is not regulated by any financial authority and is not authorized to provide investment advice or manage assets on behalf of clients or third parties.</textarea></div></div>
+          </div>
+        </div>
+
+        <!-- PRINCIPLES -->
+        <div id="pc-principles" style="display:none;">
+          <div class="card">
+            <div class="card-header"><div class="card-title">About Page — Core Principles</div><button class="btn btn-blue btn-sm" onclick="addPrinciple()">＋ Add</button></div>
+            <div style="font-size:.78rem;color:var(--muted2);margin-bottom:1.2rem;">These appear on the right column of the About page.</div>
+            <div id="principles-editor" style="display:flex;flex-direction:column;gap:1rem;"></div>
+          </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div id="pc-footer" style="display:none;">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Footer Content</div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Brand Description</label><textarea class="f-input f-textarea" id="ft-desc">Research-driven investing focused on asymmetric opportunities, disciplined risk management, and long-term value creation in public markets.</textarea></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Tagline Pills (3 pills, comma separated)</label><input class="f-input" id="ft-pills" value="Asset Quality,Asymmetric Upside,Alpha Generation"></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Bottom Note</label><input class="f-input" id="ft-note" value="Not regulated · For informational purposes only"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Research Page</div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Page Title</label><input class="f-input" id="rp-title" value="Proprietary Market Intelligence"></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Page Subtitle</label><input class="f-input" id="rp-sub" value="Deep-dive investment research built around asymmetric opportunities, structural dislocations, and disciplined risk frameworks."></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Featured Article Title</label><input class="f-input" id="rp-feat-title" value="Structural Re-Rating in Global Semiconductor Supply Chains: A Multi-Quarter Asymmetric Setup"></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Featured Article Excerpt</label><textarea class="f-input f-textarea" id="rp-feat-sub">Geopolitical fragmentation, AI-driven demand acceleration, and inventory normalization create a convergent setup rarely seen in public markets.</textarea></div></div>
+            <div class="f-row cols2">
+              <div class="f-group"><label class="f-label">Featured Article Date</label><input class="f-input" id="rp-feat-date" value="April 2026 · 18 min read"></div>
+              <div class="f-group"><label class="f-label">Featured Chart Label (e.g. +127%)</label><input class="f-input" id="rp-feat-growth" value="+127%"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Portfolio Page</div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Page Title</label><input class="f-input" id="pp-title" value="High-Conviction Positions"></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Page Subtitle</label><input class="f-input" id="pp-sub" value="Deep-research, asymmetric ideas selected for structural trends, mispricing, and forward-looking catalysts. Updated quarterly."></div></div>
+            <div class="f-row"><div class="f-group"><label class="f-label">Portfolio Disclaimer</label><textarea class="f-input f-textarea" id="pp-disclaimer">Portfolio displayed for informational purposes only. Past performance is not indicative of future results. This does not constitute investment advice.</textarea></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ THEME ═══ -->
+      <div class="section" id="s-theme">
+        <div class="s-header">
+          <div><div class="s-title">◐ Theme &amp; Colors</div><div class="s-sub">Customize the color palette of the live website. Changes apply on save.</div></div>
+          <div style="display:flex;gap:.8rem;">
+            <button class="btn btn-ghost" onclick="resetTheme()">↺ Reset Defaults</button>
+            <button class="btn btn-gold" onclick="saveTheme()">↓ Save Theme</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">◐ Color Palette</div></div>
+          <div class="color-grid" id="color-grid"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Aa Typography</div></div>
+          <div class="f-row cols2">
+            <div class="f-group">
+              <label class="f-label">Display Font</label>
+              <select class="f-input f-select" id="font-display">
+                <option value="'Cormorant Garamond', serif" selected>Cormorant Garamond (Current)</option>
+                <option value="'Playfair Display', serif">Playfair Display</option>
+                <option value="'DM Serif Display', serif">DM Serif Display</option>
+                <option value="'Libre Baskerville', serif">Libre Baskerville</option>
+              </select>
+            </div>
+            <div class="f-group">
+              <label class="f-label">UI Font</label>
+              <select class="f-input f-select" id="font-ui">
+                <option value="'Syne', sans-serif" selected>Syne (Current)</option>
+                <option value="'Outfit', sans-serif">Outfit</option>
+                <option value="'Space Grotesk', sans-serif">Space Grotesk</option>
+                <option value="'DM Sans', sans-serif">DM Sans</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">✦ Effects &amp; Motion</div></div>
+          <div style="display:flex;flex-direction:column;gap:1.4rem;">
+            <div>
+              <label class="f-label" style="display:block;margin-bottom:.6rem;">Particle Count</label>
+              <div class="range-wrap"><input type="range" min="20" max="200" value="80" id="r-particles" oninput="this.nextElementSibling.textContent=this.value"><span class="range-val">80</span></div>
+            </div>
+            <div>
+              <label class="f-label" style="display:block;margin-bottom:.6rem;">Particle Speed</label>
+              <div class="range-wrap"><input type="range" min="1" max="10" value="5" id="r-speed" oninput="this.nextElementSibling.textContent=this.value"><span class="range-val">5</span></div>
+            </div>
+            <div>
+              <label class="f-label" style="display:block;margin-bottom:.6rem;">Background Blur Intensity</label>
+              <div class="range-wrap"><input type="range" min="0" max="40" value="20" id="r-blur" oninput="this.nextElementSibling.textContent=this.value+'px'"><span class="range-val">20px</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SITE SETTINGS ═══ -->
+      <div class="section" id="s-site">
+        <div class="s-header">
+          <div><div class="s-title">⊛ Site Settings</div><div class="s-sub">Configure global site settings, metadata, and admin credentials.</div></div>
+          <button class="btn btn-gold" onclick="saveSiteSettings()">↓ Save Settings</button>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">◈ Branding</div></div>
+          <div class="f-row cols2">
+            <div class="f-group"><label class="f-label">Site Name</label><input class="f-input" id="s-name" value="Initium"></div>
+            <div class="f-group"><label class="f-label">Tagline</label><input class="f-input" id="s-tagline" value="Asset Management"></div>
+          </div>
+          <div class="f-row cols2">
+            <div class="f-group"><label class="f-label">Page Title</label><input class="f-input" id="s-pagetitle" value="Initium Asset Management | Research-Driven Investing"></div>
+            <div class="f-group"><label class="f-label">Footer Copyright</label><input class="f-input" id="s-copyright" value="© 2026 Initium Asset Management. All rights reserved."></div>
+          </div>
+          <div class="f-row"><div class="f-group"><label class="f-label">Legal Disclaimer</label><textarea class="f-input f-textarea" id="s-disclaimer">Initium conducts proprietary investment research and manages only its own corporate capital. The company is not regulated by any financial authority and is not authorized to provide investment advice.</textarea></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">⊗ Admin Credentials</div><span class="pill pill-red" style="font-size:.7rem;">Sensitive</span></div>
+          <div style="font-size:.8rem;color:var(--muted2);margin-bottom:1.2rem;">→ Changing credentials will require the new password on next login.</div>
+          <div class="f-row cols3">
+            <div class="f-group"><label class="f-label">Username</label><input class="f-input" id="s-adminuser" value="admin"></div>
+            <div class="f-group"><label class="f-label">New Password</label><input class="f-input" id="s-adminpass" type="password" placeholder="Leave blank to keep current"></div>
+            <div class="f-group"><label class="f-label">Confirm Password</label><input class="f-input" id="s-adminpass2" type="password" placeholder="Confirm new password"></div>
+          </div>
+        </div>
+        <div class="card" style="border-color:rgba(78,203,135,0.3);">
+          <div class="card-header"><div class="card-title">↗ Live Market Data (Finnhub)</div><span class="pill pill-green" style="font-size:.7rem;" id="finnhub-status-pill">Not connected</span></div>
+          <div style="font-size:.82rem;color:var(--muted2);line-height:1.8;margin-bottom:1.2rem;">
+            Connect a free Finnhub API key to show <strong style="color:var(--green);">real-time stock prices</strong> in the ticker band and portfolio table on the live site. Prices auto-refresh every 60 seconds.
+            <ol style="padding-left:1.4rem;margin-top:.6rem;line-height:2;">
+              <li>Go to <strong style="color:var(--green);">finnhub.io/register</strong> and create a free account</li>
+              <li>Copy your <strong style="color:var(--green);">API Key</strong> from the dashboard</li>
+              <li>Paste it below and click ↓ Save Settings</li>
+            </ol>
+            <div style="margin-top:.6rem;font-size:.76rem;color:var(--muted);">Note: the free tier covers US stocks &amp; ETFs. Indices (S&amp;P 500, NASDAQ, etc.) and gold use ETF proxies (SPY, QQQ, GLD…). Leave blank to keep the static saved values.</div>
+          </div>
+          <div class="f-row">
+            <div class="f-group">
+              <label class="f-label">Finnhub API Key</label>
+              <input class="f-input" id="s-finnhubkey" placeholder="e.g. cXXXXXXXXXXXXXXXXXXXX">
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">⊟ Data Management</div></div>
+          <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+            <button class="btn btn-green" onclick="exportData()">↓ Export All Data (JSON)</button>
+            <button class="btn btn-ghost" onclick="importData()">↑ Import Data (JSON)</button>
+            <button class="btn btn-red" onclick="resetAll()">⊗ Reset All to Defaults</button>
+          </div>
+          <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(this)">
+        </div>
+      </div>
+
+      <!-- ═══ ACCESS CONTROL ═══ -->
+      <div class="section" id="s-access">
+        <div class="s-header">
+          <div><div class="s-title">⊗ Access Control</div><div class="s-sub">Choose which pages require a login, and manage subscriber access codes. Users enter a code to unlock private content.</div></div>
+          <button class="btn btn-gold" onclick="saveAccess()">↓ Save</button>
+        </div>
+
+        <!-- Page visibility toggles -->
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">Page Visibility</div><div class="card-subtitle">Toggle which pages/sections require a subscriber login</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <div id="access-toggles"></div>
+          </div>
+        </div>
+
+        <!-- Access codes -->
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">Subscriber Access Codes</div><div class="card-subtitle">Each subscriber gets a unique code to log in on the site. Generate or type them manually.</div></div>
+            <div style="display:flex;gap:.8rem;">
+              <button class="btn btn-blue" onclick="generateCode()">⊞ Generate Code</button>
+            </div>
+          </div>
+          <div style="font-size:.78rem;color:var(--muted2);margin-bottom:1.2rem;line-height:1.6;">
+            → Share these codes with your subscribers. They enter it on the site to unlock private content. Deleting a code immediately revokes that subscriber's access.
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Code</th><th>Label / Subscriber</th><th>Plan</th><th>Created</th><th>Actions</th></tr></thead>
+            <tbody id="codes-tbody"></tbody>
+          </table>
+          <button class="btn btn-ghost" style="margin-top:1rem;" onclick="addCodeRow()">＋ Add Code Manually</button>
+        </div>
+      </div>
+
+      <!-- ═══ PAYMENTS ═══ -->
+      <div class="section" id="s-payments">
+        <div class="s-header">
+          <div><div class="s-title">◇ Payments &amp; Stripe</div><div class="s-sub">Connect Stripe to accept subscription payments. Paste your Payment Links from the Stripe Dashboard — no backend needed.</div></div>
+          <button class="btn btn-gold" onclick="savePayments()">↓ Save</button>
+        </div>
+
+        <div class="card" style="border-color:rgba(91,140,245,0.3);">
+          <div class="card-header"><div class="card-title">How to set up Stripe</div></div>
+          <ol style="font-size:.82rem;color:var(--muted2);line-height:2;padding-left:1.5rem;">
+            <li>Go to <strong style="color:var(--blue2);">dashboard.stripe.com</strong> and create a free account</li>
+            <li>Go to <strong style="color:var(--blue2);">Payment Links</strong> → Create a link for each plan</li>
+            <li>Copy each link URL and paste it below</li>
+            <li>Click ↓ Save — the Subscribe buttons on the site will redirect to Stripe Checkout</li>
+            <li>Stripe handles the payment, sends you the money, and emails the customer a receipt</li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">◈ Stripe Configuration</div></div>
+          <div class="f-row cols2">
+            <div class="f-group">
+              <label class="f-label">Stripe Publishable Key <span style="color:var(--muted);text-transform:none;letter-spacing:0;">(optional, for future use)</span></label>
+              <input class="f-input" id="stripe-pk" placeholder="pk_live_...">
+            </div>
+            <div class="f-group">
+              <label class="f-label">Currency</label>
+              <select class="f-input f-select" id="stripe-currency">
+                <option value="EUR">EUR — Euro (€)</option>
+                <option value="USD">USD — US Dollar ($)</option>
+                <option value="GBP">GBP — British Pound (£)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:1.2rem;" id="payment-plans-list"></div>
+      </div>
+
+      <!-- ═══ NOTIFICATIONS ═══ -->
+      <div class="section" id="s-notifications">
+        <div class="s-header">
+          <div><div class="s-title">◎ Notifications &amp; Forms</div><div class="s-sub">Get emailed whenever someone submits the contact or access request form on your site. Uses Formspree — free, no backend needed.</div></div>
+          <button class="btn btn-gold" onclick="saveNotifications()">↓ Save</button>
+        </div>
+
+        <div class="card" style="border-color:rgba(78,203,135,0.3);">
+          <div class="card-header"><div class="card-title">How to set up Formspree</div></div>
+          <ol style="font-size:.82rem;color:var(--muted2);line-height:2;padding-left:1.5rem;">
+            <li>Go to <strong style="color:var(--green);">formspree.io</strong> and create a free account</li>
+            <li>Click <strong style="color:var(--green);">+ New Form</strong> → give it a name (e.g. "Initium Contact")</li>
+            <li>Copy the <strong style="color:var(--green);">Form Endpoint URL</strong> (looks like <code style="background:var(--card2);padding:1px 6px;color:var(--green);">https://formspree.io/f/xabcdefg</code>)</li>
+            <li>Paste it below and save — all form submissions will be emailed to you instantly</li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">◎ Contact Form</div></div>
+          <div class="f-row">
+            <div class="f-group">
+              <label class="f-label">Formspree Endpoint URL *</label>
+              <input class="f-input" id="n-contact-url" placeholder="https://formspree.io/f/xabcdefg">
+            </div>
+          </div>
+          <div class="f-row cols2">
+            <div class="f-group">
+              <label class="f-label">Notification Email (shown to user)</label>
+              <input class="f-input" id="n-contact-email" placeholder="contact@initiumtrust.com">
+            </div>
+            <div class="f-group">
+              <label class="f-label">Success Message</label>
+              <input class="f-input" id="n-contact-success" placeholder="Message received! We'll be in touch within 2–3 days.">
+            </div>
+          </div>
+          <div style="margin-top:.5rem;">
+            <label style="display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--muted2);cursor:pointer;">
+              <label class="toggle"><input type="checkbox" id="n-contact-on" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+              Enable email notifications for contact form
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">◈ Access Request Form</div></div>
+          <div class="f-row">
+            <div class="f-group">
+              <label class="f-label">Formspree Endpoint URL *</label>
+              <input class="f-input" id="n-access-url" placeholder="https://formspree.io/f/xhijklmn">
+            </div>
+          </div>
+          <div class="f-row cols2">
+            <div class="f-group">
+              <label class="f-label">Success Message</label>
+              <input class="f-input" id="n-access-success" placeholder="Application received! We'll review it within 2–3 business days.">
+            </div>
+            <div class="f-group">
+              <label class="f-label">Auto-reply Subject</label>
+              <input class="f-input" id="n-access-subject" placeholder="Your Initium Access Request">
+            </div>
+          </div>
+          <div style="margin-top:.5rem;">
+            <label style="display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--muted2);cursor:pointer;">
+              <label class="toggle"><input type="checkbox" id="n-access-on" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+              Enable email notifications for access requests
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">↗ Test &amp; Status</div></div>
+          <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
+            <button class="btn btn-blue" onclick="testForm()">↗ Send Test Submission</button>
+            <div id="test-status" style="font-size:.8rem;color:var(--muted2);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ CLOSED POSITIONS ═══ -->
+      <div class="section" id="s-closed">
+        <div class="s-header">
+          <div><div class="s-title">⊠ Closed Positions</div><div class="s-sub">Manage historical positions that have been exited. These appear in the "Past Positions" section of the Portfolio page.</div></div>
+          <div style="display:flex;gap:.8rem;">
+            <button class="btn btn-blue" onclick="openClosedModal(null)">＋ Add Closed Position</button>
+            <button class="btn btn-gold" onclick="saveClosed()">↓ Save</button>
+          </div>
+        </div>
+
+        <!-- Summary KPIs (auto-calculated preview) -->
+        <div class="kpi-row" id="closed-kpis" style="grid-template-columns:repeat(4,1fr);"></div>
+
+        <div class="card" style="margin-bottom:1.5rem;">
+          <div class="card-header">
+            <div class="card-title">◎ KPI Box Overrides</div>
+            <span class="pill pill-gold" style="font-size:.7rem;">Live-site display</span>
+          </div>
+          <div style="font-size:.82rem;color:var(--muted2);line-height:1.7;margin-bottom:1.2rem;">
+            The two KPI boxes (Total Closed, Avg Return) shown on the live site are <strong style="color:var(--gold);">auto-calculated</strong> from the closed positions above. To display custom values instead — leave the field blank to keep the auto-calculated number, or type a value to override it.
+          </div>
+          <div class="f-row cols2">
+            <div class="f-group">
+              <label class="f-label">Total Closed (override)</label>
+              <input class="f-input" id="cko-total" placeholder="Auto" type="text">
+            </div>
+            <div class="f-group">
+              <label class="f-label">Avg Return (override)</label>
+              <input class="f-input" id="cko-avg" placeholder="Auto — e.g. +47.3%" type="text">
+            </div>
+          </div>
+          <div style="display:flex;gap:.8rem;margin-top:.5rem;">
+            <button class="btn btn-gold" onclick="saveClosedOverrides()">↓ Save Overrides</button>
+            <button class="btn btn-ghost" onclick="clearClosedOverrides()">⊗ Clear All (use auto)</button>
+          </div>
+        </div>
+
+        <div class="card" style="padding:0;overflow:hidden;">
+          <table class="data-table" id="closed-table">
+            <thead>
+              <tr>
+                <th>Ticker</th>
+                <th>Company</th>
+                <th>Sector</th>
+                <th>Entry Date</th>
+                <th>Exit Date</th>
+                <th>Return</th>
+                <th>Hold Period</th>
+                <th>Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="closed-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+
+<!-- ══════════════════════ MODALS ══════════════════════ -->
+
+<!-- Ticker Modal -->
+<div class="modal-bg" id="ticker-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="ticker-modal-title">Add Ticker</div>
+      <button class="modal-close" onclick="closeModal('ticker-modal')">✕</button>
+    </div>
+    <div class="f-row cols2">
+      <div class="f-group"><label class="f-label">Symbol *</label><input class="f-input" id="tm-sym" placeholder="NVDA"></div>
+      <div class="f-group">
+        <label class="f-label">Direction</label>
+        <select class="f-input f-select" id="tm-dir">
+          <option value="true">↑ Positive</option>
+          <option value="false">↓ Negative</option>
+        </select>
+      </div>
+    </div>
+    <div class="f-row"><div class="f-group"><label class="f-label">Change Value *</label><input class="f-input" id="tm-chg" placeholder="+2.34%"></div></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('ticker-modal')">Cancel</button>
+      <button class="btn btn-blue" onclick="saveTicker()">Save Ticker</button>
+    </div>
+  </div>
+</div>
+
+<!-- Holding Modal -->
+<div class="modal-bg" id="holding-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="holding-modal-title">Add Holding</div>
+      <button class="modal-close" onclick="closeModal('holding-modal')">✕</button>
+    </div>
+    <div class="f-row cols2">
+      <div class="f-group"><label class="f-label">Ticker Symbol *</label><input class="f-input" id="hm-sym" placeholder="NVDA"></div>
+      <div class="f-group"><label class="f-label">Company Name *</label><input class="f-input" id="hm-name" placeholder="NVIDIA Corporation"></div>
+    </div>
+    <div class="f-row cols2">
+      <div class="f-group"><label class="f-label">Sector</label><input class="f-input" id="hm-sector" placeholder="Semiconductors"></div>
+      <div class="f-group"><label class="f-label">Return (e.g. +108.6%)</label><input class="f-input" id="hm-ret" placeholder="+108.6%"></div>
+    </div>
+    <div class="f-row cols2">
+      <div class="f-group"><label class="f-label">Avg Cost</label><input class="f-input" id="hm-avgcost" placeholder="$68.40"></div>
+      <div class="f-group"><label class="f-label">Last Close</label><input class="f-input" id="hm-lastclose" placeholder="$142.74"></div>
+    </div>
+    <div class="f-row cols2">
+      <div class="f-group">
+        <label class="f-label">Direction</label>
+        <select class="f-input f-select" id="hm-pos">
+          <option value="true">↑ Positive Return</option>
+          <option value="false">↓ Negative Return</option>
+        </select>
+      </div>
+      <div class="f-group">
+        <label class="f-label">Conviction (1–5 dots)</label>
+        <select class="f-input f-select" id="hm-conv">
+          <option value="1">1 — Low</option>
+          <option value="2">2 — Moderate-Low</option>
+          <option value="3">3 — Moderate</option>
+          <option value="4">4 — High</option>
+          <option value="5">5 — Very High</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('holding-modal')">Cancel</button>
+      <button class="btn btn-blue" onclick="saveHolding()">Save Holding</button>
+    </div>
+  </div>
+</div>
+
+<!-- Article Modal — Full Screen Editor -->
+<div class="modal-bg" id="article-modal" style="align-items:stretch;padding:0;">
+  <div class="article-editor">
+
+    <!-- Editor Header -->
+    <div class="ae-header">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="ae-back" onclick="closeModal('article-modal')">← Back</button>
+        <div class="ae-header-title" id="article-modal-title">New Research Article</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:.8rem;">
+        <span class="ae-status" id="ae-status">Unsaved</span>
+        <button class="btn btn-blue" onclick="saveArticle()">↓ Save Article</button>
+      </div>
+    </div>
+
+    <div class="ae-body">
+
+      <!-- Left: Metadata panel -->
+      <div class="ae-meta">
+        <div class="ae-meta-title">Article Details</div>
+
+        <div class="f-group" style="margin-bottom:1rem;">
+          <label class="f-label">Category *</label>
+          <select class="f-input f-select" id="am-cat">
+            <option value="eq">Equity</option>
+            <option value="mc">Macro</option>
+            <option value="rk">Risk</option>
+            <option value="th">Thesis</option>
+          </select>
+        </div>
+
+        <div class="f-group" style="margin-bottom:1rem;">
+          <label class="f-label">Publication Date *</label>
+          <input class="f-input" id="am-date" placeholder="May 2026">
+        </div>
+
+        <div class="f-group" style="margin-bottom:1rem;">
+          <label class="f-label">Title *</label>
+          <textarea class="f-input" id="am-title" rows="3" placeholder="Full article title..." style="resize:vertical;"></textarea>
+        </div>
+
+        <div class="f-group" style="margin-bottom:1rem;">
+          <label class="f-label">Short Excerpt <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;">(shown on card)</span></label>
+          <textarea class="f-input" id="am-excerpt" rows="4" placeholder="2–3 sentence summary shown on the flip card..." style="resize:vertical;"></textarea>
+        </div>
+
+        <div class="f-group" style="margin-bottom:1.5rem;">
+          <label class="f-label">Estimated Read Time</label>
+          <input class="f-input" id="am-time" placeholder="12 min">
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding-top:1rem;">
+          <div class="ae-meta-title" style="margin-bottom:.8rem;">Access Level</div>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:.82rem;color:var(--muted2);">
+            <label class="toggle">
+              <input type="checkbox" id="am-free" checked>
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+            Free preview (no login needed)
+          </label>
+          <p style="font-size:.72rem;color:var(--muted);margin-top:.5rem;line-height:1.5;">When off, full content requires a subscription. The excerpt is always visible.</p>
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding-top:1rem;margin-top:1rem;">
+          <div class="ae-meta-title" style="margin-bottom:.6rem;">Word Count</div>
+          <div style="font-family:'DM Mono',monospace;font-size:1.2rem;color:var(--blue2);" id="ae-wordcount">0</div>
+          <div style="font-size:.72rem;color:var(--muted);margin-top:2px;">words in full content</div>
+        </div>
+      </div>
+
+      <!-- Right: Rich text editor -->
+      <div class="ae-content">
+        <!-- Toolbar -->
+        <div class="rte-toolbar" id="rte-toolbar">
+          <div class="rte-group">
+            <button class="rte-btn" onclick="fmt('bold')" title="Bold"><strong>B</strong></button>
+            <button class="rte-btn" onclick="fmt('italic')" title="Italic"><em>I</em></button>
+            <button class="rte-btn" onclick="fmt('underline')" title="Underline" style="text-decoration:underline;">U</button>
+            <button class="rte-btn" onclick="fmt('strikeThrough')" title="Strikethrough" style="text-decoration:line-through;">S</button>
+          </div>
+          <div class="rte-sep"></div>
+          <div class="rte-group">
+            <button class="rte-btn" onclick="fmtBlock('h1')" title="Heading 1" style="font-size:.8rem;font-weight:700;">H1</button>
+            <button class="rte-btn" onclick="fmtBlock('h2')" title="Heading 2" style="font-size:.8rem;font-weight:700;">H2</button>
+            <button class="rte-btn" onclick="fmtBlock('h3')" title="Heading 3" style="font-size:.8rem;font-weight:700;">H3</button>
+            <button class="rte-btn" onclick="fmtBlock('p')" title="Paragraph" style="font-size:.8rem;">¶</button>
+          </div>
+          <div class="rte-sep"></div>
+          <div class="rte-group">
+            <button class="rte-btn" onclick="fmt('insertUnorderedList')" title="Bullet list">≡</button>
+            <button class="rte-btn" onclick="fmt('insertOrderedList')" title="Numbered list">1.</button>
+          </div>
+          <div class="rte-sep"></div>
+          <div class="rte-group">
+            <button class="rte-btn" onclick="fmtBlock('blockquote')" title="Blockquote">"</button>
+            <button class="rte-btn" onclick="insertHR()" title="Divider">—</button>
+            <button class="rte-btn" onclick="insertLink()" title="Link">↗</button>
+          </div>
+          <div class="rte-sep"></div>
+          <div class="rte-group">
+            <button class="rte-btn" onclick="fmt('justifyLeft')" title="Align left">⬤ L</button>
+            <button class="rte-btn" onclick="fmt('justifyCenter')" title="Center">⬤ C</button>
+          </div>
+          <div class="rte-sep"></div>
+          <div class="rte-group">
+            <button class="rte-btn rte-danger" onclick="clearEditor()" title="Clear all">✕ Clear</button>
+          </div>
+        </div>
+
+        <!-- Editable area -->
+        <div class="rte-area" id="rte-area" contenteditable="true"
+          data-placeholder="Start writing your full research analysis here…
+
+Use headings to structure your report: Investment Thesis, Key Drivers, Risks, Valuation, Conclusion.
+
+Select text and use the toolbar above to format it."
+          oninput="onEditorInput()">
+        </div>
+
+        <!-- Word count bar at bottom -->
+        <div class="rte-footer">
+          <span style="color:var(--muted);font-size:.75rem;">Tip: Select text then click a format button. Press Enter for new paragraph.</span>
+          <span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted2);" id="rte-chars">0 chars</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Closed Position Modal -->
+<div class="modal-bg" id="closed-modal">
+  <div class="modal" style="width:min(640px,94vw);">
+    <div class="modal-header">
+      <div class="modal-title" id="closed-modal-title">Add Closed Position</div>
+      <button class="modal-close" onclick="closeModal('closed-modal')">✕</button>
+    </div>
+    <div class="f-row cols2">
+      <div class="f-group"><label class="f-label">Ticker Symbol *</label><input class="f-input" id="cm-sym" placeholder="NVDA"></div>
+      <div class="f-group"><label class="f-label">Company Name *</label><input class="f-input" id="cm-name" placeholder="NVIDIA Corporation"></div>
+    </div>
+    <div class="f-row cols2">
+      <div class="f-group"><label class="f-label">Sector</label><input class="f-input" id="cm-sector" placeholder="Semiconductors"></div>
+      <div class="f-group"><label class="f-label">Return (e.g. +74.2%)</label><input class="f-input" id="cm-ret" placeholder="+74.2%"></div>
+    </div>
+    <div class="f-row cols2">
+      <div class="f-group">
+        <label class="f-label">Outcome</label>
+        <select class="f-input f-select" id="cm-pos">
+          <option value="true">↑ Gain</option>
+          <option value="false">↓ Loss</option>
+        </select>
+      </div>
+      <div class="f-group"><label class="f-label">Hold Period (e.g. 14 months)</label><input class="f-input" id="cm-period" placeholder="14 months"></div>
+    </div>
+    <div class="f-row cols2">
+      <div class="f-group"><label class="f-label">Entry Date</label><input class="f-input" id="cm-entry" placeholder="Jan 2024"></div>
+      <div class="f-group"><label class="f-label">Exit Date</label><input class="f-input" id="cm-exit" placeholder="Mar 2025"></div>
+    </div>
+    <div class="f-row">
+      <div class="f-group"><label class="f-label">Exit Notes / Thesis Summary</label><textarea class="f-input f-textarea" id="cm-notes" placeholder="Brief reason for exit, what played out, lessons learned..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('closed-modal')">Cancel</button>
+      <button class="btn btn-blue" onclick="saveClosedPosition()">Save Position</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ SCRIPTS ══════════════════════ -->
+<script>
+'use strict';
+
+/* ═══════════════════ CONSTANTS ═══════════════════ */
+const ADMIN_USER = 'admin';
+let   ADMIN_PASS = 'Initium@2026';
+
+/* ═══════════════════ HELPERS ═══════════════════ */
+function loadLS(key, fallback) {
+  try {
+    const v = localStorage.getItem('initium_' + key);
+    return v ? JSON.parse(v) : (fallback !== undefined ? fallback : null);
+  } catch(e) { return fallback !== undefined ? fallback : null; }
+}
+
+/* ═══════════════════ DEFAULT DATA ═══════════════════ */
+const DEFAULTS = {
+  tickers: [
+    {sym:'NVDA',chg:'+4.12%',pos:true},{sym:'META',chg:'+2.87%',pos:true},
+    {sym:'TSM',chg:'+1.54%',pos:true},{sym:'ASML',chg:'-0.38%',pos:false},
+    {sym:'MSFT',chg:'+0.91%',pos:true},{sym:'BRKB',chg:'+0.22%',pos:true},
+    {sym:'AMZN',chg:'+1.67%',pos:true},{sym:'BABA',chg:'-1.12%',pos:false},
+    {sym:'S&P500',chg:'+0.84%',pos:true},{sym:'NASDAQ',chg:'+1.23%',pos:true},
+    {sym:'DAX',chg:'+0.54%',pos:true},{sym:'NIKKEI',chg:'-0.21%',pos:false},
+    {sym:'FTSE',chg:'+0.33%',pos:true},{sym:'HANG SENG',chg:'-0.67%',pos:false},
+    {sym:'GOLD',chg:'+0.18%',pos:true},
+  ],
+  holdings: [
+    {sym:'NVDA',name:'NVIDIA Corporation',sector:'Semiconductors',avgCost:'$68.40',lastClose:'$142.74',ret:'+108.6%',pos:true,conv:5},
+    {sym:'META',name:'Meta Platforms Inc.',sector:'Digital Adv.',avgCost:'$281.20',lastClose:'$554.62',ret:'+97.6%',pos:true,conv:4},
+    {sym:'TSM',name:'Taiwan Semiconductor',sector:'Semiconductors',avgCost:'$96.50',lastClose:'$159.50',ret:'+65.3%',pos:true,conv:5},
+    {sym:'ASML',name:'ASML Holding N.V.',sector:'Semicond. Equip.',avgCost:'$612.80',lastClose:'$891.10',ret:'+45.4%',pos:true,conv:3},
+    {sym:'MSFT',name:'Microsoft Corporation',sector:'Cloud / AI',avgCost:'$334.10',lastClose:'$416.32',ret:'+24.6%',pos:true,conv:3},
+    {sym:'BRKB',name:'Berkshire Hathaway B',sector:'Diversified',avgCost:'$385.00',lastClose:'$457.40',ret:'+18.8%',pos:true,conv:2},
+    {sym:'AMZN',name:'Amazon.com Inc.',sector:'Cloud / E-Com.',avgCost:'$162.30',lastClose:'$186.00',ret:'+14.6%',pos:true,conv:2},
+    {sym:'BABA',name:'Alibaba Group',sector:'EM Technology',avgCost:'$95.20',lastClose:'$86.60',ret:'-9.0%',pos:false,conv:3},
+  ],
+  allocation: [
+    {name:'Semiconductors',pct:45,color:'#D4A843'},
+    {name:'Cloud / AI',pct:25,color:'#4B9EFF'},
+    {name:'Diversified',pct:18,color:'#7B68EE'},
+    {name:'EM Technology',pct:12,color:'#FF7A3D'},
+  ],
+  articles: [
+    {cat:'mc',title:'The Fragmentation Premium: How Geopolitical Decoupling Creates Structural Equity Dislocations',excerpt:'As global supply chains fracture along geopolitical lines, we identify systematic mispricing in companies positioned at the nexus of onshoring and reshoring capital expenditure cycles.',date:'Apr 2026',time:'14 min'},
+    {cat:'eq',title:'Energy Transition Mispricing: Uranium Royalty Companies as Asymmetric Vehicles',excerpt:'Nuclear\'s renaissance is underpriced by consensus. We examine the royalty structure opportunity within uranium supply chains as AI-driven power demand accelerates.',date:'Mar 2026',time:'11 min'},
+    {cat:'rk',title:'Liquidity Illusion: Why Mid-Cap Spreads Signal the Next Rotation Opportunity',excerpt:'Bid-ask spread analysis across mid-cap indices reveals a systematic liquidity premium that has historically preceded significant revaluation events.',date:'Mar 2026',time:'9 min'},
+    {cat:'th',title:'Indian Financial Inclusion: A Decade-Long Structural Compounding Thesis',excerpt:'With 400M+ underbanked individuals and accelerating mobile penetration, we present a framework for identifying asymmetric compounders within India\'s financial services sector.',date:'Feb 2026',time:'16 min'},
+    {cat:'mc',title:'Dollar Cycle Inflection: Positioning for EM Currency Tailwinds in 2026–2027',excerpt:'Historical analysis of USD cycles suggests we may be entering a multi-year softening phase with profound implications for emerging market equities and commodity-linked assets.',date:'Feb 2026',time:'12 min'},
+    {cat:'eq',title:'Defense Tech: Separating Signal from Noise in the NATO Rearmament Cycle',excerpt:'European defense spending commitments represent a multi-year capex cycle. We identify tier-2 companies overlooked by consensus that offer superior asymmetry.',date:'Jan 2026',time:'13 min'},
+    {cat:'th',title:'Japanese Corporate Reform: Unlocking Decades of Dormant Value in Industrial Conglomerates',excerpt:'Pressure from activist investors and regulatory changes are forcing Japan\'s industrial conglomerates to unlock significant balance sheet value.',date:'Jan 2026',time:'10 min'},
+  ],
+  hero: {
+    eyebrow:'Research-Driven Alpha',
+    line1:'Identifying',
+    italic:'Mispriced',
+    line2:'Opportunities in',
+    italic2:'Public Markets',
+    sub:'Research-driven investing focused on asymmetric opportunities, disciplined risk management, and long-term value creation.',
+    btn1:'Explore Portfolio',
+    btn2:'Our Investment Thesis',
+  },
+  stats: [
+    {val:347,suffix:'%',label:'Portfolio Return (3yr)'},
+    {val:8,suffix:'',label:'Active Positions'},
+    {val:100,suffix:'%',label:'Independent Research'},
+    {val:24,suffix:'x',label:'Avg Upside / Downside'},
+    {val:0,suffix:'',label:'Benchmark Mandates'},
+  ],
+  kpis: [
+    {val:'8',label:'Active Positions',color:'g'},
+    {val:'+34.7%',label:'YTD Performance',color:'p'},
+    {val:'2.4×',label:'Avg Up/Down',color:'g'},
+    {val:'+18.2%',label:'vs Benchmark',color:'p'},
+    {val:'0.78',label:'Sharpe Ratio',color:'g'},
+  ],
+  plans: [
+    {name:'Observer',price:'€0',period:'Free forever',featured:false,features:[{ok:true,text:'Summary research abstracts'},{ok:true,text:'Investment philosophy articles'},{ok:true,text:'Monthly market commentary'},{ok:false,text:'Full research reports'},{ok:false,text:'Portfolio holdings detail'},{ok:false,text:'Risk framework docs'}]},
+    {name:'Analyst',price:'€49',period:'Billed monthly · Cancel anytime',featured:true,features:[{ok:true,text:'Everything in Observer'},{ok:true,text:'Full research reports (all categories)'},{ok:true,text:'Quarterly portfolio updates'},{ok:true,text:'Risk framework full access'},{ok:true,text:'Historical research archive'},{ok:false,text:'Real-time position alerts'}]},
+    {name:'Institutional',price:'€249',period:'Billed annually (save 20%)',featured:false,features:[{ok:true,text:'Everything in Analyst'},{ok:true,text:'Real-time entry/exit alerts'},{ok:true,text:'Full model & valuation workbooks'},{ok:true,text:'Monthly 1:1 research Q&A'},{ok:true,text:'Priority email (24h SLA)'},{ok:true,text:'Team seat for up to 3 users'}]},
+  ],
+  contact: {
+    email:'contact@initiumtrust.com',
+    response:'2–3 Business Days',
+    conf:'All communications handled with full discretion',
+    focus:'Subscription access · Research enquiries · Institutional partnerships',
+    subtitle:'For subscription enquiries, research questions, or institutional access requests. We respond within 2–3 business days.',
+  },
+  theme: {
+    bg:'#05070D', bg2:'#090C16', bg3:'#0E1221',
+    gold:'#D4A843', gold2:'#F0C866',
+    cream:'#EDE8DA', muted:'#6B6860',
+    green:'#52D68A', red:'#E05C5C',
+  },
+  site: {
+    name:'Initium', tagline:'Asset Management',
+    pagetitle:'Initium Asset Management | Research-Driven Investing',
+    copyright:'© 2026 Initium Asset Management. All rights reserved.',
+    disclaimer:'Initium conducts proprietary investment research and manages only its own corporate capital.',
+  },
+};
+
+/* ═══════════════════ STATE ═══════════════════ */
+let D = {}; // live data
+let editIdx = -1; // for modals
+
+/* ═══════════════════ LOGIN ═══════════════════ */
+function doLogin() {
+  const u = document.getElementById('l-user').value.trim();
+  const p = document.getElementById('l-pass').value;
+  const stored = localStorage.getItem('initium_adminpass');
+  const pw = stored || ADMIN_PASS;
+  const un = localStorage.getItem('initium_adminuser') || ADMIN_USER;
+  if (u === un && p === pw) {
+    sessionStorage.setItem('initium_admin_auth', '1');
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    initApp();
+  } else {
+    const err = document.getElementById('login-error');
+    err.style.display = 'block';
+    err.style.animation = 'none';
+    setTimeout(() => err.style.animation = '', 10);
+  }
+}
+document.getElementById('l-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('l-user').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('l-pass').focus(); });
+
+function logout() {
+  sessionStorage.removeItem('initium_admin_auth');
+  location.reload();
+}
+
+// Auto-login if session exists
+if (sessionStorage.getItem('initium_admin_auth') === '1') {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  window.addEventListener('load', initApp);
+}
+
+/* ═══════════════════ INIT ═══════════════════ */
+function initApp() {
+  loadData();
+  renderAll();
+  startClock();
+  updateBadges();
+  updateDashboard();
+}
+
+function loadData() {
+  D = {};
+  for (const [k, v] of Object.entries(DEFAULTS)) {
+    try {
+      const stored = localStorage.getItem('initium_' + k);
+      D[k] = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(v));
+    } catch(e) {
+      D[k] = JSON.parse(JSON.stringify(v));
+    }
+  }
+}
+
+function persist(key) {
+  localStorage.setItem('initium_' + key, JSON.stringify(D[key]));
+  localStorage.setItem('initium_lastsaved', new Date().toLocaleTimeString());
+  updateDashboard();
+}
+
+function saveAll() {
+  Object.keys(DEFAULTS).forEach(k => localStorage.setItem('initium_' + k, JSON.stringify(D[k])));
+  localStorage.setItem('initium_lastsaved', new Date().toLocaleTimeString());
+  updateDashboard();
+  toast('All changes saved successfully ✓', 'success');
+}
+
+/* ═══════════════════ CLOCK ═══════════════════ */
+function startClock() {
+  function tick() {
+    document.getElementById('topbar-time').textContent = new Date().toLocaleTimeString();
+  }
+  tick(); setInterval(tick, 1000);
+}
+
+/* ═══════════════════ SECTION NAV ═══════════════════ */
+const SECTION_META = {
+  herochart:   {icon:'∿', title:'Hero Chart'},
+  pagecontent: {icon:'▤', title:'All Pages Content'},
+  dashboard:   {icon:'▦', title:'Dashboard'},
+  tickers:     {icon:'↗', title:'Ticker Stocks'},
+  portfolio:   {icon:'◈', title:'Portfolio Holdings'},
+  allocation:  {icon:'◑', title:'Sector Allocation'},
+  closed:      {icon:'⊠', title:'Closed Positions'},
+  research:    {icon:'⊞', title:'Research Articles'},
+  hero:        {icon:'▣', title:'Hero Section'},
+  stats:       {icon:'≡', title:'Stats & KPIs'},
+  plans:       {icon:'◇', title:'Subscription Plans'},
+  contact:     {icon:'◎', title:'Contact Information'},
+  access:      {icon:'⊗', title:'Access Control'},
+  payments:    {icon:'◇', title:'Payments & Stripe'},
+  notifications:{icon:'◎', title:'Notifications & Forms'},
+  theme:       {icon:'◐', title:'Theme & Colors'},
+  site:        {icon:'⊛', title:'Site Settings'},
+};
+
+function showSection(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  const meta = SECTION_META[id] || {};
+  document.getElementById('topbar-icon').textContent = meta.icon || '▦';
+  document.getElementById('topbar-title-text').textContent = meta.title || id;
+  renderSection(id);
+}
+
+function renderSection(id) {
+  if (id === 'tickers')       renderTickers();
+  if (id === 'portfolio')     renderHoldings();
+  if (id === 'allocation')    renderAllocation();
+  if (id === 'closed')        { renderClosed(); loadClosedOverrides(); }
+  if (id === 'research')      renderArticles();
+  if (id === 'hero')          loadHeroForm();
+  if (id === 'herochart')     loadHeroChart();
+  if (id === 'pagecontent')   loadPageContentForm();
+  if (id === 'stats')         renderStats();
+  if (id === 'plans')         renderPlans();
+  if (id === 'contact')       loadContact();
+  if (id === 'theme')         renderTheme();
+  if (id === 'site')          loadSite();
+  if (id === 'access')        renderAccessSection();
+  if (id === 'payments')      renderPayments();
+  if (id === 'notifications') loadNotifications();
+}
+
+function renderAll() {
+  renderTickers(); renderHoldings(); renderAllocation();
+  renderArticles(); renderStats(); renderPlans(); renderTheme();
+  loadHeroForm(); loadContact(); loadSite();
+}
+
+/* ═══════════════════ TICKERS ═══════════════════ */
+function renderTickers() {
+  const tb = document.getElementById('tickers-tbody');
+  tb.innerHTML = '';
+  D.tickers.forEach((t, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--muted);font-family:'DM Mono',monospace;">${i+1}</td>
+      <td><span class="sym-badge">${t.sym}</span></td>
+      <td class="${t.pos?'val-green':'val-red'}">${t.chg}</td>
+      <td><span class="pill ${t.pos?'pill-green':'pill-red'}">${t.pos?'↑ Positive':'↓ Negative'}</span></td>
+      <td>
+        <div style="display:flex;gap:.5rem;">
+          <button class="btn btn-ghost btn-sm" onclick="openTickerModal(${i})">✏ Edit</button>
+          <button class="btn btn-red btn-sm" onclick="deleteTicker(${i})">✕</button>
+        </div>
+      </td>`;
+    tb.appendChild(tr);
+  });
+  updateBadges();
+}
+
+let tickerEditIdx = -1;
+function openTickerModal(idx) {
+  tickerEditIdx = idx;
+  if (idx === null) {
+    tickerEditIdx = -1;
+    document.getElementById('ticker-modal-title').textContent = 'Add New Ticker';
+    document.getElementById('tm-sym').value = '';
+    document.getElementById('tm-chg').value = '';
+    document.getElementById('tm-dir').value = 'true';
+  } else {
+    const t = D.tickers[idx];
+    document.getElementById('ticker-modal-title').textContent = 'Edit Ticker: ' + t.sym;
+    document.getElementById('tm-sym').value = t.sym;
+    document.getElementById('tm-chg').value = t.chg;
+    document.getElementById('tm-dir').value = String(t.pos);
+  }
+  openModal('ticker-modal');
+}
+function saveTicker() {
+  const t = {
+    sym: document.getElementById('tm-sym').value.trim().toUpperCase(),
+    chg: document.getElementById('tm-chg').value.trim(),
+    pos: document.getElementById('tm-dir').value === 'true',
+  };
+  if (!t.sym || !t.chg) { toast('Please fill in all fields','error'); return; }
+  if (tickerEditIdx === -1) D.tickers.push(t);
+  else D.tickers[tickerEditIdx] = t;
+  persist('tickers');
+  closeModal('ticker-modal');
+  renderTickers();
+  toast(`Ticker ${t.sym} ${tickerEditIdx === -1 ? 'added & saved' : 'updated & saved'} ✓`, 'success');
+}
+function deleteTicker(i) {
+  if (!confirm(`Remove ${D.tickers[i].sym} from the ticker?`)) return;
+  D.tickers.splice(i, 1);
+  persist('tickers');
+  renderTickers();
+  toast('Ticker removed & saved', 'info');
+}
+function saveTickers() { persist('tickers'); toast('Tickers saved ✓','success'); }
+
+/* ═══════════════════ HOLDINGS ═══════════════════ */
+function renderHoldings() {
+  const tb = document.getElementById('holdings-tbody');
+  tb.innerHTML = '';
+  D.holdings.forEach((h, i) => {
+    const dots = Array.from({length:5}, (_,j) => `<div class="star ${j<h.conv?'':'off'}"></div>`).join('');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="sym-badge">${h.sym}</span></td>
+      <td>${h.name}</td>
+      <td><span style="color:var(--muted2);">${h.sector}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted2);">${h.avgCost || '—'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:.78rem;">${h.lastClose || '—'}</td>
+      <td class="${h.pos?'val-green':'val-red'}">${h.ret}</td>
+      <td><div class="stars">${dots}</div></td>
+      <td>
+        <div style="display:flex;gap:.5rem;">
+          <button class="btn btn-ghost btn-sm" onclick="openHoldingModal(${i})">✏</button>
+          <button class="btn btn-red btn-sm" onclick="deleteHolding(${i})">✕</button>
+        </div>
+      </td>`;
+    tb.appendChild(tr);
+  });
+  updateBadges();
+}
+
+let holdEditIdx = -1;
+function openHoldingModal(idx) {
+  holdEditIdx = idx;
+  if (idx === null) {
+    holdEditIdx = -1;
+    document.getElementById('holding-modal-title').textContent = 'Add New Holding';
+    ['hm-sym','hm-name','hm-sector','hm-ret','hm-avgcost','hm-lastclose'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('hm-pos').value = 'true';
+    document.getElementById('hm-conv').value = '3';
+  } else {
+    const h = D.holdings[idx];
+    document.getElementById('holding-modal-title').textContent = 'Edit Holding: ' + h.sym;
+    document.getElementById('hm-sym').value = h.sym;
+    document.getElementById('hm-name').value = h.name;
+    document.getElementById('hm-sector').value = h.sector;
+    document.getElementById('hm-ret').value = h.ret;
+    document.getElementById('hm-avgcost').value   = h.avgCost   || '';
+    document.getElementById('hm-lastclose').value = h.lastClose || '';
+    document.getElementById('hm-pos').value = String(h.pos);
+    document.getElementById('hm-conv').value = h.conv;
+  }
+  openModal('holding-modal');
+}
+function saveHolding() {
+  const h = {
+    sym:    document.getElementById('hm-sym').value.trim().toUpperCase(),
+    name:   document.getElementById('hm-name').value.trim(),
+    sector: document.getElementById('hm-sector').value.trim(),
+    ret:    document.getElementById('hm-ret').value.trim(),
+    avgCost:   document.getElementById('hm-avgcost').value.trim(),
+    lastClose: document.getElementById('hm-lastclose').value.trim(),
+    pos:    document.getElementById('hm-pos').value === 'true',
+    conv:   parseInt(document.getElementById('hm-conv').value),
+  };
+  if (!h.sym || !h.name) { toast('Please fill in required fields', 'error'); return; }
+  if (holdEditIdx === -1) D.holdings.push(h);
+  else D.holdings[holdEditIdx] = h;
+  persist('holdings');
+  closeModal('holding-modal');
+  renderHoldings();
+  toast(`${h.sym} ${holdEditIdx === -1 ? 'added & saved' : 'updated & saved'} ✓`, 'success');
+}
+function deleteHolding(i) {
+  if (!confirm(`Remove ${D.holdings[i].sym} from portfolio?`)) return;
+  D.holdings.splice(i, 1);
+  persist('holdings');
+  renderHoldings();
+  toast('Holding removed & saved', 'info');
+}
+function saveHoldings() { persist('holdings'); toast('Portfolio saved ✓','success'); }
+
+/* ═══════════════════ ALLOCATION ═══════════════════ */
+function renderAllocation() {
+  const list = document.getElementById('alloc-list');
+  list.innerHTML = '';
+  D.allocation.forEach((a, i) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:auto 1fr auto 60px auto;gap:1rem;align-items:center;';
+    row.innerHTML = `
+      <input type="color" class="f-color" value="${a.color}" title="Sector color" onchange="D.allocation[${i}].color=this.value;updateAllocTotal()">
+      <input class="f-input" value="${a.name}" placeholder="Sector name" onchange="D.allocation[${i}].name=this.value">
+      <input class="f-input" type="number" min="0" max="100" value="${a.pct}" style="width:80px;" oninput="D.allocation[${i}].pct=+this.value;updateAllocTotal()">
+      <span style="font-size:.78rem;color:var(--muted2);">%</span>
+      <button class="btn btn-red btn-icon" onclick="D.allocation.splice(${i},1);renderAllocation()" title="Remove">✕</button>`;
+    list.appendChild(row);
+  });
+  updateAllocTotal();
+}
+function updateAllocTotal() {
+  const total = D.allocation.reduce((s,a) => s + (+a.pct), 0);
+  const el = document.getElementById('alloc-total');
+  el.textContent = total + '%';
+  el.style.color = total === 100 ? 'var(--green)' : 'var(--red)';
+}
+function addAllocItem() {
+  D.allocation.push({name:'New Sector',pct:0,color:'#888888'});
+  renderAllocation();
+}
+function saveAllocation() {
+  const total = D.allocation.reduce((s,a) => s + (+a.pct), 0);
+  if (total !== 100) { toast(`Percentages must total 100% (currently ${total}%)`, 'error'); return; }
+  persist('allocation');
+  toast('Sector allocation saved ✓','success');
+}
+
+/* ═══════════════════ ARTICLES ═══════════════════ */
+const CAT_LABELS = {eq:'Equity',mc:'Macro',rk:'Risk',th:'Thesis'};
+const CAT_CLASSES = {eq:'pill-gold',mc:'pill-blue',rk:'pill-red',th:'pill-amber'};
+
+function renderArticles() {
+  const tb = document.getElementById('articles-tbody');
+  tb.innerHTML = '';
+  D.articles.forEach((a, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="pill ${CAT_CLASSES[a.cat]||'pill-blue'}">${CAT_LABELS[a.cat]||a.cat}</span></td>
+      <td style="max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${a.title}">${a.title}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:.78rem;">${a.date}</td>
+      <td>${a.time}</td>
+      <td>
+        <div style="display:flex;gap:.5rem;">
+          <button class="btn btn-ghost btn-sm" onclick="openArticleModal(${i})">✏</button>
+          <button class="btn btn-red btn-sm" onclick="deleteArticle(${i})">✕</button>
+        </div>
+      </td>`;
+    tb.appendChild(tr);
+  });
+  updateBadges();
+}
+
+let artEditIdx = -1;
+function openArticleModal(idx) {
+  artEditIdx = idx;
+  const editor = document.getElementById('rte-area');
+  if (idx === null) {
+    artEditIdx = -1;
+    document.getElementById('article-modal-title').textContent = 'New Research Article';
+    document.getElementById('am-cat').value = 'eq';
+    document.getElementById('am-title').value = '';
+    document.getElementById('am-excerpt').value = '';
+    document.getElementById('am-date').value = new Date().toLocaleDateString('en-GB', {month:'short', year:'numeric'});
+    document.getElementById('am-time').value = '';
+    document.getElementById('am-free').checked = true;
+    editor.innerHTML = '';
+  } else {
+    const a = D.articles[idx];
+    document.getElementById('article-modal-title').textContent = 'Editing: ' + a.title.substring(0, 40) + '…';
+    document.getElementById('am-cat').value = a.cat;
+    document.getElementById('am-title').value = a.title;
+    document.getElementById('am-excerpt').value = a.excerpt;
+    document.getElementById('am-date').value = a.date;
+    document.getElementById('am-time').value = a.time;
+    document.getElementById('am-free').checked = a.free !== false;
+    editor.innerHTML = a.content || '';
+  }
+  updateEditorStats();
+  setEditorStatus('Unsaved');
+  openModal('article-modal');
+  setTimeout(() => editor.focus(), 200);
+}
+
+function saveArticle() {
+  const title   = document.getElementById('am-title').value.trim();
+  const excerpt = document.getElementById('am-excerpt').value.trim();
+  if (!title || !excerpt) { toast('Please fill in title and excerpt', 'error'); return; }
+  const a = {
+    cat:     document.getElementById('am-cat').value,
+    title,
+    excerpt,
+    date:    document.getElementById('am-date').value.trim() || 'May 2026',
+    time:    document.getElementById('am-time').value.trim() || '—',
+    free:    document.getElementById('am-free').checked,
+    content: document.getElementById('rte-area').innerHTML,
+  };
+  if (artEditIdx === -1) D.articles.push(a);
+  else D.articles[artEditIdx] = a;
+  persist('articles');
+  setEditorStatus('Saved ✓');
+  renderArticles();
+  closeModal('article-modal');
+  toast(`Article "${title.substring(0,30)}…" ${artEditIdx === -1 ? 'published' : 'updated'} ✓`, 'success');
+}
+
+/* ── RICH TEXT EDITOR HELPERS ─────────────── */
+function fmt(cmd, val) {
+  document.getElementById('rte-area').focus();
+  document.execCommand(cmd, false, val || null);
+  updateEditorStats();
+}
+function fmtBlock(tag) {
+  document.getElementById('rte-area').focus();
+  document.execCommand('formatBlock', false, tag);
+  updateEditorStats();
+}
+function insertHR() {
+  document.getElementById('rte-area').focus();
+  document.execCommand('insertHTML', false, '<hr>');
+}
+function insertLink() {
+  const url = prompt('Enter URL:', 'https://');
+  if (url) { document.getElementById('rte-area').focus(); document.execCommand('createLink', false, url); }
+}
+function clearEditor() {
+  if (!confirm('Clear all content in the editor?')) return;
+  document.getElementById('rte-area').innerHTML = '';
+  updateEditorStats();
+}
+function onEditorInput() {
+  updateEditorStats();
+  setEditorStatus('Unsaved');
+}
+function updateEditorStats() {
+  const text = document.getElementById('rte-area').innerText || '';
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  const chars = text.length;
+  document.getElementById('ae-wordcount').textContent = words.toLocaleString();
+  document.getElementById('rte-chars').textContent = chars.toLocaleString() + ' chars';
+  // Auto-estimate read time
+  if (!document.getElementById('am-time').value) {
+    const mins = Math.max(1, Math.round(words / 230));
+    document.getElementById('am-time').placeholder = mins + ' min (estimated)';
+  }
+}
+function setEditorStatus(txt) {
+  const el = document.getElementById('ae-status');
+  el.textContent = txt;
+  el.className = 'ae-status' + (txt.includes('Saved') ? ' saved' : '');
+}
+function deleteArticle(i) {
+  if (!confirm('Remove this article?')) return;
+  D.articles.splice(i, 1);
+  persist('articles');
+  renderArticles();
+  toast('Article removed & saved', 'info');
+}
+function saveArticles() { persist('articles'); toast('Research articles saved ✓','success'); }
+
+/* ═══════════════════ HERO ═══════════════════ */
+function loadHeroForm() {
+  const h = D.hero;
+  document.getElementById('h-eyebrow').value = h.eyebrow;
+  document.getElementById('h-line1').value   = h.line1;
+  document.getElementById('h-italic').value  = h.italic;
+  document.getElementById('h-line2').value   = h.line2;
+  document.getElementById('h-italic2').value = h.italic2;
+  document.getElementById('h-sub').value     = h.sub;
+  document.getElementById('h-btn1').value    = h.btn1;
+  document.getElementById('h-btn2').value    = h.btn2;
+  ['h-eyebrow','h-line1','h-italic','h-line2','h-italic2','h-sub','h-btn1','h-btn2'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateHeroPreview);
+  });
+  updateHeroPreview();
+}
+function updateHeroPreview() {
+  const em = 'style="background:linear-gradient(135deg,#D4A843,#F0C866);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;"';
+  document.getElementById('prev-eyebrow').textContent = document.getElementById('h-eyebrow').value;
+  document.getElementById('prev-headline').innerHTML =
+    `${document.getElementById('h-line1').value} <em ${em}>${document.getElementById('h-italic').value}</em><br>${document.getElementById('h-line2').value} <em ${em}>${document.getElementById('h-italic2').value}</em>`;
+  document.getElementById('prev-sub').textContent  = document.getElementById('h-sub').value;
+  document.getElementById('prev-btn1').textContent = document.getElementById('h-btn1').value;
+  document.getElementById('prev-btn2').textContent = document.getElementById('h-btn2').value;
+}
+function saveHero() {
+  D.hero = {
+    eyebrow: document.getElementById('h-eyebrow').value,
+    line1:   document.getElementById('h-line1').value,
+    italic:  document.getElementById('h-italic').value,
+    line2:   document.getElementById('h-line2').value,
+    italic2: document.getElementById('h-italic2').value,
+    sub:     document.getElementById('h-sub').value,
+    btn1:    document.getElementById('h-btn1').value,
+    btn2:    document.getElementById('h-btn2').value,
+  };
+  persist('hero');
+  toast('Hero content saved ✓','success');
+}
+
+/* ═══════════════════ STATS ═══════════════════ */
+function renderStats() {
+  const list = document.getElementById('stats-list');
+  list.innerHTML = '';
+  D.stats.forEach((s, i) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:80px 1fr 1fr auto;gap:1rem;align-items:center;padding:.8rem;background:var(--card2);border:1px solid var(--border);';
+    row.innerHTML = `
+      <input class="f-input" type="number" value="${s.val}" style="font-family:'DM Mono',monospace;" placeholder="347" oninput="D.stats[${i}].val=+this.value">
+      <input class="f-input" value="${s.suffix}" placeholder="% or x" oninput="D.stats[${i}].suffix=this.value" style="max-width:80px;">
+      <input class="f-input" value="${s.label}" placeholder="Label text" oninput="D.stats[${i}].label=this.value">
+      <button class="btn btn-red btn-sm" onclick="D.stats.splice(${i},1);renderStats()">✕</button>`;
+    list.appendChild(row);
+  });
+
+  const kpiList = document.getElementById('kpi-list');
+  kpiList.innerHTML = '';
+  D.kpis.forEach((k, i) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 120px;gap:1rem;align-items:center;padding:.8rem;background:var(--card2);border:1px solid var(--border);';
+    row.innerHTML = `
+      <input class="f-input" value="${k.val}" placeholder="+34.7%" oninput="D.kpis[${i}].val=this.value" style="font-family:'DM Mono',monospace;">
+      <input class="f-input" value="${k.label}" placeholder="Label" oninput="D.kpis[${i}].label=this.value">
+      <select class="f-input f-select" onchange="D.kpis[${i}].color=this.value">
+        <option value="g" ${k.color==='g'?'selected':''}>Gold</option>
+        <option value="p" ${k.color==='p'?'selected':''}>Green</option>
+        <option value="n" ${k.color==='n'?'selected':''}>Red</option>
+      </select>`;
+    kpiList.appendChild(row);
+  });
+}
+function addStat() {
+  D.stats.push({val:0,suffix:'',label:'New Metric'});
+  renderStats();
+}
+function saveStats() { persist('stats'); persist('kpis'); toast('Stats & KPIs saved ✓','success'); }
+
+/* ═══════════════════ PLANS ═══════════════════ */
+function renderPlans() {
+  const list = document.getElementById('plans-list');
+  list.innerHTML = '';
+  D.plans.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.style.margin = '0';
+    const featsHtml = p.features.map((f, fi) => `
+      <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;">
+        <label class="toggle" title="Toggle feature">
+          <input type="checkbox" ${f.ok?'checked':''} onchange="D.plans[${i}].features[${fi}].ok=this.checked">
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+        <input class="f-input" value="${f.text}" style="flex:1;" oninput="D.plans[${i}].features[${fi}].text=this.value">
+        <button class="btn btn-red btn-icon btn-sm" onclick="D.plans[${i}].features.splice(${fi},1);renderPlans()">✕</button>
+      </div>`).join('');
+    div.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <div class="f-group" style="flex:1;">
+          <label class="f-label">Plan Name</label>
+          <input class="f-input" value="${p.name}" oninput="D.plans[${i}].name=this.value">
+        </div>
+        <label class="toggle" style="margin-left:1rem;" title="Featured plan">
+          <input type="checkbox" ${p.featured?'checked':''} onchange="D.plans[${i}].featured=this.checked">
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+        <span style="font-size:.7rem;color:var(--muted2);margin-left:.4rem;">Featured</span>
+      </div>
+      <div class="f-row cols2" style="margin-bottom:1rem;">
+        <div class="f-group"><label class="f-label">Price</label><input class="f-input" value="${p.price}" oninput="D.plans[${i}].price=this.value"></div>
+        <div class="f-group"><label class="f-label">Period/Subtitle</label><input class="f-input" value="${p.period}" oninput="D.plans[${i}].period=this.value"></div>
+      </div>
+      <div class="f-label" style="margin-bottom:.6rem;">Features</div>
+      <div id="feats-${i}">${featsHtml}</div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:.6rem;" onclick="D.plans[${i}].features.push({ok:true,text:'New feature'});renderPlans()">＋ Add Feature</button>`;
+    list.appendChild(div);
+  });
+}
+function savePlans() { persist('plans'); toast('Subscription plans saved ✓','success'); }
+
+/* ═══════════════════ CONTACT ═══════════════════ */
+function loadContact() {
+  const c = D.contact;
+  document.getElementById('c-email').value    = c.email || '';
+  document.getElementById('c-response').value = c.response || '';
+  document.getElementById('c-conf').value     = c.conf || '';
+  document.getElementById('c-focus').value    = c.focus || '';
+  document.getElementById('c-subtitle').value = c.subtitle || '';
+}
+function saveContact() {
+  D.contact = {
+    email:    document.getElementById('c-email').value,
+    response: document.getElementById('c-response').value,
+    conf:     document.getElementById('c-conf').value,
+    focus:    document.getElementById('c-focus').value,
+    subtitle: document.getElementById('c-subtitle').value,
+  };
+  persist('contact');
+  toast('Contact info saved ✓','success');
+}
+
+/* ═══════════════════ THEME ═══════════════════ */
+const THEME_LABELS = {
+  bg:'Background', bg2:'Background 2', bg3:'Background 3',
+  gold:'Gold Accent', gold2:'Gold Light',
+  cream:'Text Color', muted:'Muted Text',
+  green:'Positive / Green', red:'Negative / Red',
+};
+function renderTheme() {
+  const grid = document.getElementById('color-grid');
+  grid.innerHTML = '';
+  Object.entries(D.theme).forEach(([k, v]) => {
+    const div = document.createElement('div');
+    div.className = 'color-item';
+    div.innerHTML = `
+      <div class="color-swatch" style="background:${v};" title="Click to change">
+        <input class="color-input-hidden" type="color" value="${v}" oninput="D.theme['${k}']=this.value;this.closest('.color-swatch').style.background=this.value">
+      </div>
+      <div class="color-lbl">${THEME_LABELS[k]||k}</div>
+      <div class="color-val">${v}</div>`;
+    grid.appendChild(div);
+  });
+}
+function resetTheme() {
+  D.theme = JSON.parse(JSON.stringify(DEFAULTS.theme));
+  renderTheme();
+  toast('Theme reset to defaults','info');
+}
+function saveTheme() { persist('theme'); toast('Theme saved ✓','success'); }
+
+/* ═══════════════════ SITE SETTINGS ═══════════════════ */
+function loadSite() {
+  const s = D.site;
+  document.getElementById('s-name').value       = s.name || '';
+  document.getElementById('s-tagline').value    = s.tagline || '';
+  document.getElementById('s-pagetitle').value  = s.pagetitle || '';
+  document.getElementById('s-copyright').value  = s.copyright || '';
+  document.getElementById('s-disclaimer').value = s.disclaimer || '';
+  const fk = localStorage.getItem('initium_finnhub_key') || '';
+  document.getElementById('s-finnhubkey').value = fk;
+  const pill = document.getElementById('finnhub-status-pill');
+  if (pill) {
+    pill.textContent = fk ? '◉ Connected' : 'Not connected';
+    pill.className = 'pill ' + (fk ? 'pill-green' : 'pill-red');
+    pill.style.fontSize = '.7rem';
+  }
+}
+function saveSiteSettings() {
+  D.site = {
+    name:      document.getElementById('s-name').value,
+    tagline:   document.getElementById('s-tagline').value,
+    pagetitle: document.getElementById('s-pagetitle').value,
+    copyright: document.getElementById('s-copyright').value,
+    disclaimer:document.getElementById('s-disclaimer').value,
+  };
+  persist('site');
+
+  // Handle password change
+  const newPw = document.getElementById('s-adminpass').value;
+  const confPw = document.getElementById('s-adminpass2').value;
+  const newUn = document.getElementById('s-adminuser').value;
+  if (newPw) {
+    if (newPw !== confPw) { toast('Passwords do not match','error'); return; }
+    localStorage.setItem('initium_adminpass', newPw);
+    ADMIN_PASS = newPw;
+    document.getElementById('s-adminpass').value = '';
+    document.getElementById('s-adminpass2').value = '';
+    toast('Password updated successfully ✓','success');
+  }
+  if (newUn) { localStorage.setItem('initium_adminuser', newUn); }
+
+  // Live market data API key
+  const fk = document.getElementById('s-finnhubkey').value.trim();
+  if (fk) {
+    localStorage.setItem('initium_finnhub_key', fk);
+  } else {
+    localStorage.removeItem('initium_finnhub_key');
+  }
+  const pill = document.getElementById('finnhub-status-pill');
+  if (pill) {
+    pill.textContent = fk ? '◉ Connected' : 'Not connected';
+    pill.className = 'pill ' + (fk ? 'pill-green' : 'pill-red');
+    pill.style.fontSize = '.7rem';
+  }
+
+  toast('Site settings saved ✓','success');
+}
+
+/* ═══════════════════ DATA EXPORT / IMPORT ═══════════════════ */
+function exportData() {
+  const blob = new Blob([JSON.stringify(D, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'initium-data-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  toast('Data exported ✓','success');
+}
+function importData() { document.getElementById('import-file').click(); }
+function handleImport(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      Object.assign(D, imported);
+      renderAll();
+      toast('Data imported successfully ✓','success');
+    } catch(err) {
+      toast('Invalid JSON file','error');
+    }
+  };
+  reader.readAsText(file);
+}
+function resetAll() {
+  if (!confirm('Reset ALL data to defaults? This cannot be undone.')) return;
+  Object.keys(DEFAULTS).forEach(k => localStorage.removeItem('initium_' + k));
+  loadData(); renderAll(); updateBadges(); updateDashboard();
+  toast('All data reset to defaults','info');
+}
+
+/* ═══════════════════ MODALS ═══════════════════ */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-bg').forEach(m => {
+  m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
+});
+
+/* ═══════════════════ TOAST ═══════════════════ */
+function toast(msg, type='info') {
+  const icons = { success:'✓', error:'✕', info:'→' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span class="toast-icon">${icons[type]||'→'}</span><span class="toast-msg">${msg}</span>`;
+  const wrap = document.getElementById('toast-wrap');
+  wrap.appendChild(t);
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(20px)';
+    t.style.transition = 'all .3s';
+    setTimeout(() => t.remove(), 300);
+  }, 3000);
+}
+
+/* ═══════════════════ BADGES & DASHBOARD ═══════════════════ */
+function updateBadges() {
+  document.getElementById('badge-tickers').textContent  = D.tickers.length;
+  document.getElementById('badge-holdings').textContent = D.holdings.length;
+  document.getElementById('badge-research').textContent = D.articles.length;
+  document.getElementById('d-tickers').textContent  = D.tickers.length;
+  document.getElementById('d-holdings').textContent = D.holdings.length;
+  document.getElementById('d-articles').textContent = D.articles.length;
+  updateClosedBadge(loadLS('closed', DEFAULTS_CLOSED));
+}
+function updateDashboard() {
+  const ls = localStorage.getItem('initium_lastsaved');
+  document.getElementById('d-lastsaved').textContent = ls || 'Never';
+  let bytes = 0;
+  for (let k in localStorage) {
+    if (k.startsWith('initium_')) bytes += (localStorage.getItem(k)||'').length;
+  }
+  document.getElementById('d-storage').textContent = (bytes/1024).toFixed(1) + ' KB';
+}
+
+/* ═══════════════════ LAUNCH SITE ═══════════════════ */
+function launchSite() {
+  saveAll();
+  window.open('initium-pro.html', '_blank');
+}
+
+/* ═══════════════════ HERO CHART ═══════════════════ */
+const CHART_STYLES = {
+  steady:    [190,175,165,155,145,130,120,115,100,90,80,70,60,50,40,30,22,15,10],
+  explosive: [190,185,180,175,170,160,145,125,100,80,60,45,30,20,12,8,5,3,2],
+  volatile:  [190,178,182,168,172,155,165,148,130,118,105,95,88,72,60,48,35,22,10],
+  vshape:    [190,185,188,182,176,185,178,170,155,130,105,80,55,35,20,12,8,4,2],
+  flat:      [190,188,187,188,186,185,184,182,170,150,125,98,70,45,28,18,10,5,2],
+};
+
+function generateChartPath(style, gain, vol, W, H) {
+  const base = CHART_STYLES[style] || CHART_STYLES.steady;
+  const N = base.length;
+  const gainFactor = gain / 180;
+  const pts = [];
+  for (let i = 0; i < N; i++) {
+    const t = i / (N - 1);
+    const bY = base[i] * gainFactor;
+    const noise = (Math.sin(t * 13.7 + i) * 0.5 + Math.sin(t * 7.3) * 0.5) * vol * 5 * (1 - t * 0.5);
+    const x = t * W;
+    const y = Math.max(5, Math.min(H - 5, bY + noise));
+    pts.push([x, y]);
+  }
+  let d = `M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
+  for (let i = 1; i < pts.length; i++) {
+    const [px, py] = pts[i - 1];
+    const [cx, cy] = pts[i];
+    const cpx = (px + cx) / 2;
+    d += ` Q${cpx.toFixed(1)},${py.toFixed(1)} ${cx.toFixed(1)},${cy.toFixed(1)}`;
+  }
+  const area = d + ` L${pts[pts.length-1][0]},${H+10} L0,${H+10} Z`;
+  return { line: d, area, endPt: pts[pts.length - 1], midPt: pts[Math.floor(N/2)] };
+}
+
+function previewChart() {
+  const style    = document.getElementById('ch-style')?.value     || 'steady';
+  const gain     = parseInt(document.getElementById('ch-gain')?.value  || 180);
+  const vol      = parseInt(document.getElementById('ch-vol')?.value   || 3);
+  const lineCol  = document.getElementById('ch-linecolor')?.value  || '#E8C96B';
+  const dotCol   = document.getElementById('ch-dotcolor')?.value   || '#4DFFEF';
+  const growth   = document.getElementById('ch-growth')?.value     || '+68%';
+  const startD   = document.getElementById('ch-start')?.value      || 'Q1 2023';
+  const endD     = document.getElementById('ch-end')?.value        || 'Q1 2026';
+  const pos      = document.getElementById('ch-pos')?.value        || 'mid';
+  const { line, area, endPt, midPt } = generateChartPath(style, gain, vol, 900, 195);
+  const svg = document.getElementById('chart-preview-svg');
+  if (!svg) return;
+  svg.querySelector('#preview-line').setAttribute('d', line);
+  svg.querySelector('#preview-line').setAttribute('stroke', lineCol);
+  svg.querySelector('#preview-area').setAttribute('d', area);
+  svg.querySelector('#pAreaStop').setAttribute('stop-color', lineCol);
+  const dot = svg.querySelector('#preview-dot');
+  dot.setAttribute('cx', endPt[0]); dot.setAttribute('cy', endPt[1]);
+  dot.setAttribute('fill', dotCol);
+  dot.style.filter = `drop-shadow(0 0 8px ${dotCol})`;
+  const growthEl = svg.querySelector('#preview-growth');
+  growthEl.textContent = growth;
+  const gx = pos === 'top' ? endPt[0] - 80 : midPt[0] - 20;
+  const gy = pos === 'top' ? endPt[1] - 12  : midPt[1] - 10;
+  growthEl.setAttribute('x', Math.max(10, gx));
+  growthEl.setAttribute('y', Math.max(20, gy));
+  growthEl.setAttribute('fill', 'rgba(232,201,107,.85)');
+  svg.querySelector('#preview-startdate').textContent = startD;
+  svg.querySelector('#preview-enddate').textContent   = endD;
+  svg.querySelector('#preview-enddate').setAttribute('x', Math.max(700, endPt[0] - 80));
+  const hexLine = document.getElementById('ch-linecolor-hex');
+  const hexDot  = document.getElementById('ch-dotcolor-hex');
+  if (hexLine) hexLine.value = lineCol;
+  if (hexDot)  hexDot.value  = dotCol;
+}
+
+function saveHeroChart() {
+  const data = {
+    style: document.getElementById('ch-style').value,
+    gain:  document.getElementById('ch-gain').value,
+    vol:   document.getElementById('ch-vol').value,
+    growth:    document.getElementById('ch-growth').value,
+    startDate: document.getElementById('ch-start').value,
+    endDate:   document.getElementById('ch-end').value,
+    pos:       document.getElementById('ch-pos').value,
+    lineColor: document.getElementById('ch-linecolor').value,
+    dotColor:  document.getElementById('ch-dotcolor').value,
+  };
+  localStorage.setItem('initium_herochart', JSON.stringify(data));
+  localStorage.setItem('initium_lastsaved', new Date().toLocaleTimeString());
+  updateDashboard(); toast('Hero chart saved ✓', 'success');
+}
+
+function loadHeroChart() {
+  const d = loadLS('herochart', {});
+  if (d.style)  document.getElementById('ch-style').value = d.style;
+  if (d.gain) { document.getElementById('ch-gain').value = d.gain; const rv = document.querySelector('#ch-gain + .range-val'); if(rv) rv.textContent='+'+d.gain+'%'; }
+  if (d.vol)  { document.getElementById('ch-vol').value  = d.vol;  const rv = document.querySelector('#ch-vol + .range-val');  if(rv) rv.textContent=d.vol; }
+  if (d.growth)    document.getElementById('ch-growth').value = d.growth;
+  if (d.startDate) document.getElementById('ch-start').value  = d.startDate;
+  if (d.endDate)   document.getElementById('ch-end').value    = d.endDate;
+  if (d.pos)       document.getElementById('ch-pos').value    = d.pos;
+  if (d.lineColor) { document.getElementById('ch-linecolor').value = d.lineColor; document.getElementById('ch-linecolor-hex').value = d.lineColor; }
+  if (d.dotColor)  { document.getElementById('ch-dotcolor').value  = d.dotColor;  document.getElementById('ch-dotcolor-hex').value  = d.dotColor; }
+  setTimeout(previewChart, 150);
+}
+
+/* ═══════════════════ PAGE CONTENT ═══════════════════ */
+const DEFAULT_STEPS = [
+  {label:'Screen',  title:'Discover',    desc:'Macro indicators, sector data, valuation dislocations, and quantitative signals surface initial candidates.'},
+  {label:'Analyse', title:'Research',    desc:'Deep fundamental analysis, market structure review, moat evaluation, and catalyst identification.'},
+  {label:'Validate',title:'Stress-Test', desc:'Multiple downside, base, and upside scenarios. Liquidity, volatility, and systemic exposure checks.'},
+  {label:'Deploy',  title:'Conviction',  desc:'Only clear asymmetry with defined risk and strong forward catalysts earns a portfolio place.'},
+];
+const DEFAULT_CARDS = [
+  {icon:'◈',title:'Independent Thinking', desc:'We prioritize original analysis over consensus-driven market commentary. No index mandates. No quarterly redemption pressure. Pure conviction built on first principles.'},
+  {icon:'⬡',title:'Asymmetric Focus',     desc:"We seek opportunities where upside potential materially outweighs downside risk. If the risk/reward isn't compelling enough, capital stays patient."},
+  {icon:'◎',title:'Risk Discipline',      desc:'Every idea is evaluated through liquidity, volatility, drawdown, and macro sensitivity lenses. Upside is earned by controlling downside first. Always.'},
+];
+const DEFAULT_PRINCIPLES = [
+  {title:'Mispriced Asset Identification',desc:'Deep fundamental analysis to find quality assets trading below intrinsic value due to temporary dislocation or consensus neglect.'},
+  {title:'Technical Structure & Timing',  desc:'Using technical price structures to understand optimal entry and execution — improving risk-adjusted deployment of conviction.'},
+  {title:'Long-Term Analytical Horizon',  desc:'Multi-quarter to multi-year horizon, ignoring short-term noise in favor of fundamental re-rating and catalyst realization.'},
+  {title:'Asymmetric Risk-Reward',        desc:'Opportunities with limited, defined downside and meaningful, disproportionate upside potential before any capital is deployed.'},
+];
+
+function renderStepsEditor() {
+  const steps = loadLS('page_steps', DEFAULT_STEPS);
+  const el = document.getElementById('steps-editor');
+  el.innerHTML = '';
+  window.D_steps = JSON.parse(JSON.stringify(steps));
+  steps.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'card'; div.style.margin = '0 0 1rem 0';
+    div.innerHTML = `
+      <div class="card-header"><div class="card-title">Step ${i+1}</div>
+        <button class="btn btn-red btn-sm" onclick="removeStep(${i})">✕ Remove</button></div>
+      <div class="f-row cols2">
+        <div class="f-group"><label class="f-label">Step Label</label>
+          <input class="f-input" value="${s.label}" oninput="D_steps[${i}].label=this.value"></div>
+        <div class="f-group"><label class="f-label">Step Title</label>
+          <input class="f-input" value="${s.title}" oninput="D_steps[${i}].title=this.value"></div>
+      </div>
+      <div class="f-group"><label class="f-label">Description</label>
+        <textarea class="f-input f-textarea" oninput="D_steps[${i}].desc=this.value">${s.desc}</textarea></div>`;
+    el.appendChild(div);
+  });
+  const addBtn = document.createElement('button');
+  addBtn.className = 'btn btn-blue'; addBtn.textContent = '＋ Add Step';
+  addBtn.onclick = addStep; el.appendChild(addBtn);
+}
+function addStep() { window.D_steps.push({label:'New',title:'New Step',desc:'Description...'}); renderStepsEditor(); }
+function removeStep(i) { window.D_steps.splice(i,1); renderStepsEditor(); }
+
+function renderCardsEditor() {
+  const cards = loadLS('page_cards', DEFAULT_CARDS);
+  const el = document.getElementById('cards-editor');
+  el.innerHTML = '';
+  window.D_cards = JSON.parse(JSON.stringify(cards));
+  cards.forEach((c, i) => {
+    const div = document.createElement('div');
+    div.className = 'card'; div.style.margin = '0 0 1rem 0';
+    div.innerHTML = `
+      <div class="card-header"><div class="card-title">Feature Card ${i+1}</div></div>
+      <div class="f-row cols2">
+        <div class="f-group"><label class="f-label">Icon / Symbol</label>
+          <input class="f-input" value="${c.icon}" oninput="D_cards[${i}].icon=this.value"></div>
+        <div class="f-group"><label class="f-label">Title</label>
+          <input class="f-input" value="${c.title}" oninput="D_cards[${i}].title=this.value"></div>
+      </div>
+      <div class="f-group"><label class="f-label">Description</label>
+        <textarea class="f-input f-textarea" oninput="D_cards[${i}].desc=this.value">${c.desc}</textarea></div>`;
+    el.appendChild(div);
+  });
+}
+
+function renderPrinciplesEditor() {
+  const ps = loadLS('page_principles', DEFAULT_PRINCIPLES);
+  const el = document.getElementById('principles-editor');
+  el.innerHTML = '';
+  window.D_principles = JSON.parse(JSON.stringify(ps));
+  ps.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'card'; div.style.margin = '0 0 1rem 0';
+    div.innerHTML = `
+      <div class="card-header"><div class="card-title">Principle ${i+1}</div>
+        <button class="btn btn-red btn-sm" onclick="removePrinciple(${i})">✕</button></div>
+      <div class="f-group" style="margin-bottom:.8rem;"><label class="f-label">Title</label>
+        <input class="f-input" value="${p.title}" oninput="D_principles[${i}].title=this.value"></div>
+      <div class="f-group"><label class="f-label">Description</label>
+        <textarea class="f-input f-textarea" oninput="D_principles[${i}].desc=this.value">${p.desc}</textarea></div>`;
+    el.appendChild(div);
+  });
+  const addBtn = document.createElement('button');
+  addBtn.className = 'btn btn-blue'; addBtn.textContent = '＋ Add Principle';
+  addBtn.onclick = addPrinciple; el.appendChild(addBtn);
+}
+function addPrinciple() { window.D_principles.push({title:'New Principle',desc:'Description...'}); renderPrinciplesEditor(); }
+function removePrinciple(i) { window.D_principles.splice(i,1); renderPrinciplesEditor(); }
+
+function loadPageContentForm() {
+  const pc = loadLS('pagecontent', {});
+  const set = (id, val) => { const el = document.getElementById(id); if(el && val) el.value = val; };
+  set('cta-title',pc.ctaTitle); set('cta-sub',pc.ctaSub); set('cta-btn1',pc.ctaBtn1); set('cta-btn2',pc.ctaBtn2);
+  set('form-title',pc.formTitle); set('form-sub',pc.formSub); set('form-note',pc.formNote);
+  set('ab-title',pc.abTitle); set('ab-sub',pc.abSub); set('ab-lefttitle',pc.abLeftTitle); set('ab-quote',pc.abQuote);
+  set('ab-p1',pc.abP1); set('ab-p2',pc.abP2); set('ab-p3',pc.abP3);
+  set('ab-righttitle',pc.abRightTitle); set('ab-legal',pc.abLegal);
+  set('ft-desc',pc.ftDesc); set('ft-pills',pc.ftPills); set('ft-note',pc.ftNote);
+  set('rp-title',pc.rpTitle); set('rp-sub',pc.rpSub); set('rp-feat-title',pc.rpFeatTitle);
+  set('rp-feat-sub',pc.rpFeatSub); set('rp-feat-date',pc.rpFeatDate); set('rp-feat-growth',pc.rpFeatGrowth);
+  set('pp-title',pc.ppTitle); set('pp-sub',pc.ppSub); set('pp-disclaimer',pc.ppDisclaimer);
+  renderStepsEditor(); renderCardsEditor(); renderPrinciplesEditor();
+}
+
+function savePageContent() {
+  const g = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+  const data = {
+    ctaTitle:g('cta-title'),ctaSub:g('cta-sub'),ctaBtn1:g('cta-btn1'),ctaBtn2:g('cta-btn2'),
+    formTitle:g('form-title'),formSub:g('form-sub'),formNote:g('form-note'),
+    abTitle:g('ab-title'),abSub:g('ab-sub'),abLeftTitle:g('ab-lefttitle'),abQuote:g('ab-quote'),
+    abP1:g('ab-p1'),abP2:g('ab-p2'),abP3:g('ab-p3'),abRightTitle:g('ab-righttitle'),abLegal:g('ab-legal'),
+    ftDesc:g('ft-desc'),ftPills:g('ft-pills'),ftNote:g('ft-note'),
+    rpTitle:g('rp-title'),rpSub:g('rp-sub'),rpFeatTitle:g('rp-feat-title'),
+    rpFeatSub:g('rp-feat-sub'),rpFeatDate:g('rp-feat-date'),rpFeatGrowth:g('rp-feat-growth'),
+    ppTitle:g('pp-title'),ppSub:g('pp-sub'),ppDisclaimer:g('pp-disclaimer'),
+  };
+  localStorage.setItem('initium_pagecontent', JSON.stringify(data));
+  if (window.D_steps)      localStorage.setItem('initium_page_steps',      JSON.stringify(window.D_steps));
+  if (window.D_cards)      localStorage.setItem('initium_page_cards',      JSON.stringify(window.D_cards));
+  if (window.D_principles) localStorage.setItem('initium_page_principles', JSON.stringify(window.D_principles));
+  localStorage.setItem('initium_lastsaved', new Date().toLocaleTimeString());
+  updateDashboard(); toast('All page content saved ✓', 'success');
+}
+
+function pcTab(btn, panelId) {
+  document.querySelectorAll('#pc-tabs .f-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  ['pc-process','pc-cards','pc-cta','pc-about','pc-principles','pc-footer'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = id === panelId ? '' : 'none';
+  });
+}
+
+/* ═══════════════════ ACCESS CONTROL ═══════════════════ */
+const ACCESS_PAGES = [
+  { id:'portfolio',     label:'Portfolio Holdings',    icon:'◈', desc:'Holdings table, allocation chart, risk metrics' },
+  { id:'research',      label:'Research Articles',     icon:'⊞', desc:'Full research articles (flip cards)' },
+  { id:'subscriptions', label:'Subscription Plans',    icon:'◇', desc:'Pricing page' },
+  { id:'home',          label:'Home Page',             icon:'▦', desc:'Hero, stats, process section' },
+  { id:'about',         label:'About Us',              icon:'◉', desc:'Investment philosophy page' },
+  { id:'contact',       label:'Contact Page',          icon:'◎', desc:'Contact form and info' },
+];
+
+function renderAccessSection() {
+  const cfg = loadLS('access', {});
+  const tb = document.getElementById('access-toggles');
+  tb.innerHTML = '';
+  ACCESS_PAGES.forEach(p => {
+    const isPrivate = cfg[p.id] === true;
+    tb.innerHTML += `
+      <div style="display:flex;align-items:center;gap:1.2rem;padding:1rem 0;border-bottom:1px solid var(--border);">
+        <span style="font-size:1rem;width:24px;text-align:center;color:var(--blue2);">${p.icon}</span>
+        <div style="flex:1;">
+          <div style="font-size:.85rem;font-weight:600;margin-bottom:2px;">${p.label}</div>
+          <div style="font-size:.74rem;color:var(--muted2);">${p.desc}</div>
+        </div>
+        <span class="pill ${isPrivate?'pill-red':'pill-green'}" style="min-width:80px;justify-content:center;">${isPrivate?'⊗ Private':'◉ Public'}</span>
+        <label class="toggle" title="Toggle access">
+          <input type="checkbox" ${isPrivate?'checked':''} onchange="togglePageAccess('${p.id}',this.checked)">
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>`;
+  });
+
+  renderCodesTable();
+}
+
+function togglePageAccess(pageId, isPrivate) {
+  const cfg = loadLS('access', {});
+  cfg[pageId] = isPrivate;
+  localStorage.setItem('initium_access', JSON.stringify(cfg));
+  renderAccessSection();
+  toast(`${pageId} set to ${isPrivate?'Private ⊗':'Public ◉'}`, isPrivate?'info':'success');
+}
+
+function saveAccess() {
+  localStorage.setItem('initium_lastsaved', new Date().toLocaleTimeString());
+  updateDashboard();
+  toast('Access control saved ✓', 'success');
+}
+
+/* Subscriber codes */
+function renderCodesTable() {
+  const codes = loadLS('access_codes', []);
+  const tb = document.getElementById('codes-tbody');
+  tb.innerHTML = '';
+  if (!codes.length) {
+    tb.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:2rem;">No codes yet. Generate one above.</td></tr>`;
+    return;
+  }
+  codes.forEach((c, i) => {
+    tb.innerHTML += `
+      <tr>
+        <td><code style="background:var(--card2);padding:3px 10px;font-family:'DM Mono',monospace;color:var(--gold);letter-spacing:2px;font-size:.85rem;">${c.code}</code></td>
+        <td><input class="f-input" value="${c.label||''}" placeholder="e.g. John Smith" style="max-width:200px;" onchange="updateCode(${i},'label',this.value)"></td>
+        <td>
+          <select class="f-input f-select" style="max-width:140px;" onchange="updateCode(${i},'plan',this.value)">
+            <option value="observer" ${c.plan==='observer'?'selected':''}>Observer</option>
+            <option value="analyst"  ${c.plan==='analyst' ?'selected':''}>Analyst</option>
+            <option value="institutional" ${c.plan==='institutional'?'selected':''}>Institutional</option>
+          </select>
+        </td>
+        <td style="font-family:'DM Mono',monospace;font-size:.75rem;">${c.created||'—'}</td>
+        <td>
+          <div style="display:flex;gap:.5rem;">
+            <button class="btn btn-ghost btn-sm" onclick="copyCode('${c.code}')">⊞ Copy</button>
+            <button class="btn btn-red btn-sm" onclick="deleteCode(${i})">✕</button>
+          </div>
+        </td>
+      </tr>`;
+  });
+}
+
+function generateCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const code = Array.from({length:8}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+  const codes = loadLS('access_codes', []);
+  codes.push({ code, label:'', plan:'analyst', created: new Date().toLocaleDateString() });
+  localStorage.setItem('initium_access_codes', JSON.stringify(codes));
+  renderCodesTable();
+  toast(`Code ${code} generated ✓`, 'success');
+}
+
+function addCodeRow() {
+  const codes = loadLS('access_codes', []);
+  codes.push({ code:'', label:'', plan:'analyst', created: new Date().toLocaleDateString() });
+  localStorage.setItem('initium_access_codes', JSON.stringify(codes));
+  renderCodesTable();
+}
+
+function updateCode(i, field, val) {
+  const codes = loadLS('access_codes', []);
+  if (codes[i]) { codes[i][field] = val; localStorage.setItem('initium_access_codes', JSON.stringify(codes)); }
+}
+
+function deleteCode(i) {
+  const codes = loadLS('access_codes', []);
+  const c = codes[i];
+  if (!confirm(`Revoke access for code ${c.code}${c.label?' ('+c.label+')':''}?`)) return;
+  codes.splice(i, 1);
+  localStorage.setItem('initium_access_codes', JSON.stringify(codes));
+  renderCodesTable();
+  toast('Access code revoked', 'info');
+}
+
+function copyCode(code) {
+  navigator.clipboard?.writeText(code).then(() => toast(`Code ${code} copied to clipboard ✓`, 'success'))
+    .catch(() => toast(`Code: ${code}`, 'info'));
+}
+
+/* ═══════════════════ PAYMENTS ═══════════════════ */
+function renderPayments() {
+  const pay = loadLS('payments', {});
+  document.getElementById('stripe-pk').value = pay.pk || '';
+  document.getElementById('stripe-currency').value = pay.currency || 'EUR';
+
+  const list = document.getElementById('payment-plans-list');
+  const plans = loadLS('plans', DEFAULTS.plans);
+  list.innerHTML = '';
+  plans.forEach((p, i) => {
+    const link = (pay.links||{})[p.name] || '';
+    list.innerHTML += `
+      <div class="card" style="margin:0;">
+        <div class="card-header">
+          <div>
+            <div class="card-title">${p.featured?'★ ':''}${p.name} Plan — ${p.price}/mo</div>
+            <div class="card-subtitle">Stripe Payment Link for this plan</div>
+          </div>
+          ${link ? `<span class="pill pill-green">◉ Configured</span>` : `<span class="pill pill-red">⊗ Not set</span>`}
+        </div>
+        <div class="f-row cols2">
+          <div class="f-group" style="grid-column:1/-1;">
+            <label class="f-label">Stripe Payment Link URL</label>
+            <input class="f-input" placeholder="https://buy.stripe.com/..." value="${link}"
+              oninput="updatePaymentLink('${p.name}', this.value)">
+          </div>
+        </div>
+        <div style="font-size:.76rem;color:var(--muted2);margin-top:.5rem;">
+          → In your Stripe Dashboard: Payment Links → Create → Set price to ${p.price} ${pay.currency||'EUR'}/mo → Copy the link URL above
+        </div>
+      </div>`;
+  });
+}
+
+function updatePaymentLink(planName, url) {
+  const pay = loadLS('payments', {});
+  if (!pay.links) pay.links = {};
+  pay.links[planName] = url;
+  localStorage.setItem('initium_payments', JSON.stringify(pay));
+}
+
+function savePayments() {
+  const pay = loadLS('payments', {});
+  pay.pk = document.getElementById('stripe-pk').value;
+  pay.currency = document.getElementById('stripe-currency').value;
+  localStorage.setItem('initium_payments', JSON.stringify(pay));
+  toast('Payment settings saved ✓', 'success');
+}
+
+/* ═══════════════════ NOTIFICATIONS ═══════════════════ */
+function loadNotifications() {
+  const n = loadLS('notifications', {});
+  document.getElementById('n-contact-url').value     = n.contactUrl || '';
+  document.getElementById('n-contact-email').value   = n.contactEmail || '';
+  document.getElementById('n-contact-success').value = n.contactSuccess || '';
+  document.getElementById('n-contact-on').checked    = n.contactOn !== false;
+  document.getElementById('n-access-url').value      = n.accessUrl || '';
+  document.getElementById('n-access-success').value  = n.accessSuccess || '';
+  document.getElementById('n-access-subject').value  = n.accessSubject || '';
+  document.getElementById('n-access-on').checked     = n.accessOn !== false;
+}
+
+function saveNotifications() {
+  const n = {
+    contactUrl:     document.getElementById('n-contact-url').value.trim(),
+    contactEmail:   document.getElementById('n-contact-email').value.trim(),
+    contactSuccess: document.getElementById('n-contact-success').value.trim(),
+    contactOn:      document.getElementById('n-contact-on').checked,
+    accessUrl:      document.getElementById('n-access-url').value.trim(),
+    accessSuccess:  document.getElementById('n-access-success').value.trim(),
+    accessSubject:  document.getElementById('n-access-subject').value.trim(),
+    accessOn:       document.getElementById('n-access-on').checked,
+  };
+  localStorage.setItem('initium_notifications', JSON.stringify(n));
+  toast('Notification settings saved ✓', 'success');
+}
+
+async function testForm() {
+  const n = loadLS('notifications', {});
+  const url = n.contactUrl;
+  if (!url) { toast('Enter a Formspree URL first', 'error'); return; }
+  document.getElementById('test-status').textContent = 'Sending…';
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ name:'Admin Test', email:'test@initium.com', message:'Test submission from Initium Admin Panel', _subject:'[TEST] Initium Form Test' })
+    });
+    if (res.ok) {
+      document.getElementById('test-status').textContent = '✓ Test sent! Check your inbox.';
+      document.getElementById('test-status').style.color = 'var(--green)';
+      toast('Test submission sent ✓ Check your email', 'success');
+    } else {
+      throw new Error('HTTP ' + res.status);
+    }
+  } catch(e) {
+    document.getElementById('test-status').textContent = '✕ Failed: ' + e.message;
+    document.getElementById('test-status').style.color = 'var(--red)';
+    toast('Test failed — check your Formspree URL', 'error');
+  }
+}
+
+/* ═══════════════════ CLOSED POSITIONS ═══════════════════ */
+const DEFAULTS_CLOSED = [
+  {sym:'PLTR',name:'Palantir Technologies',sector:'AI / Data',ret:'+142.3%',pos:true,entry:'Aug 2023',exit:'Oct 2024',period:'14 months',notes:'Exited on government contract slowdown; commercial thesis played out fully.'},
+  {sym:'ENPH',name:'Enphase Energy',sector:'Solar / Clean Energy',ret:'-28.4%',pos:false,entry:'Feb 2023',exit:'Sep 2023',period:'7 months',notes:'Rate environment deteriorated faster than expected; stopped out at pre-set loss level.'},
+  {sym:'CRWD',name:'CrowdStrike Holdings',sector:'Cybersecurity',ret:'+87.1%',pos:true,entry:'Nov 2022',exit:'Jun 2024',period:'19 months',notes:'Full thesis realisation on enterprise expansion; trimmed on valuation stretch.'},
+];
+
+function renderClosed() {
+  const closed = loadLS('closed', DEFAULTS_CLOSED);
+  const tb = document.getElementById('closed-tbody');
+  tb.innerHTML = '';
+  if (!closed.length) {
+    tb.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:2.5rem;">No closed positions yet. Add one above.</td></tr>`;
+    renderClosedKPIs(closed);
+    updateClosedBadge(closed);
+    return;
+  }
+  closed.forEach((h, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="sym-badge">${h.sym}</span></td>
+      <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${h.name}">${h.name}</td>
+      <td><span style="color:var(--muted2);">${h.sector||'—'}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:.78rem;">${h.entry||'—'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:.78rem;">${h.exit||'—'}</td>
+      <td class="${h.pos?'val-green':'val-red'}">${h.ret}</td>
+      <td style="color:var(--muted2);font-size:.78rem;">${h.period||'—'}</td>
+      <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted2);font-size:.78rem;" title="${h.notes||''}">${h.notes||'—'}</td>
+      <td>
+        <div style="display:flex;gap:.4rem;">
+          <button class="btn btn-ghost btn-sm" onclick="openClosedModal(${i})">✏</button>
+          <button class="btn btn-red btn-sm" onclick="deleteClosedPosition(${i})">✕</button>
+        </div>
+      </td>`;
+    tb.appendChild(tr);
+  });
+  renderClosedKPIs(closed);
+  updateClosedBadge(closed);
+}
+
+function renderClosedKPIs(closed) {
+  const el = document.getElementById('closed-kpis');
+  if (!el) return;
+  const total = closed.length;
+  const wins = closed.filter(c => c.pos).length;
+  const winRate = total ? Math.round(wins / total * 100) : 0;
+  const returns = closed.map(c => parseFloat((c.ret||'0').replace('%','').replace('+','')));
+  const avgReturn = total ? (returns.reduce((a,b)=>a+b,0)/total).toFixed(1) : 0;
+  el.innerHTML = `
+    <div class="kpi blue"><div class="kpi-icon">⊠</div><div class="kpi-val">${total}</div><div class="kpi-lbl">Total Closed</div></div>
+    <div class="kpi green"><div class="kpi-icon">↑</div><div class="kpi-val">${wins}</div><div class="kpi-lbl">Winning Trades</div></div>
+    <div class="kpi gold"><div class="kpi-icon">◎</div><div class="kpi-val">${winRate}%</div><div class="kpi-lbl">Win Rate</div></div>
+    <div class="kpi ${parseFloat(avgReturn) >= 0 ? 'green' : 'purple'}"><div class="kpi-icon">≈</div><div class="kpi-val" style="font-size:1.4rem;">${parseFloat(avgReturn)>0?'+':''}${avgReturn}%</div><div class="kpi-lbl">Avg Return</div></div>
+  `;
+}
+
+function updateClosedBadge(closed) {
+  const badge = document.getElementById('badge-closed');
+  if (badge) badge.textContent = (closed || []).length;
+}
+
+let closedEditIdx = -1;
+function openClosedModal(idx) {
+  closedEditIdx = idx;
+  if (idx === null) {
+    closedEditIdx = -1;
+    document.getElementById('closed-modal-title').textContent = 'Add Closed Position';
+    ['cm-sym','cm-name','cm-sector','cm-ret','cm-period','cm-entry','cm-exit','cm-notes'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('cm-pos').value = 'true';
+  } else {
+    const h = loadLS('closed', DEFAULTS_CLOSED)[idx];
+    document.getElementById('closed-modal-title').textContent = 'Edit: ' + h.sym;
+    document.getElementById('cm-sym').value    = h.sym;
+    document.getElementById('cm-name').value   = h.name;
+    document.getElementById('cm-sector').value = h.sector||'';
+    document.getElementById('cm-ret').value    = h.ret;
+    document.getElementById('cm-pos').value    = String(h.pos);
+    document.getElementById('cm-period').value = h.period||'';
+    document.getElementById('cm-entry').value  = h.entry||'';
+    document.getElementById('cm-exit').value   = h.exit||'';
+    document.getElementById('cm-notes').value  = h.notes||'';
+  }
+  openModal('closed-modal');
+}
+
+function saveClosedPosition() {
+  const sym  = document.getElementById('cm-sym').value.trim().toUpperCase();
+  const name = document.getElementById('cm-name').value.trim();
+  if (!sym || !name) { toast('Please fill in Ticker and Company Name', 'error'); return; }
+  const entry = {
+    sym, name,
+    sector: document.getElementById('cm-sector').value.trim(),
+    ret:    document.getElementById('cm-ret').value.trim(),
+    pos:    document.getElementById('cm-pos').value === 'true',
+    period: document.getElementById('cm-period').value.trim(),
+    entry:  document.getElementById('cm-entry').value.trim(),
+    exit:   document.getElementById('cm-exit').value.trim(),
+    notes:  document.getElementById('cm-notes').value.trim(),
+  };
+  const closed = loadLS('closed', DEFAULTS_CLOSED);
+  if (closedEditIdx === -1) closed.push(entry);
+  else closed[closedEditIdx] = entry;
+  localStorage.setItem('initium_closed', JSON.stringify(closed));
+  closeModal('closed-modal');
+  renderClosed();
+  toast(`${sym} ${closedEditIdx === -1 ? 'added' : 'updated'} ✓`, 'success');
+}
+
+function deleteClosedPosition(i) {
+  const closed = loadLS('closed', DEFAULTS_CLOSED);
+  if (!confirm(`Remove ${closed[i].sym} from closed positions?`)) return;
+  closed.splice(i, 1);
+  localStorage.setItem('initium_closed', JSON.stringify(closed));
+  renderClosed();
+  toast('Position removed', 'info');
+}
+
+function saveClosed() {
+  localStorage.setItem('initium_lastsaved', new Date().toLocaleTimeString());
+  updateDashboard();
+  toast('Closed positions saved ✓', 'success');
+}
+
+/* ─── Closed-positions KPI override (manual values that override auto-calc on live site) ─── */
+function loadClosedOverrides() {
+  const o = loadLS('closed_overrides', {}) || {};
+  const set = (id, v) => { const e = document.getElementById(id); if (e) e.value = v || ''; };
+  set('cko-total', o.total);
+  set('cko-avg',   o.avg);
+}
+function saveClosedOverrides() {
+  const v = id => (document.getElementById(id)?.value || '').trim();
+  const o = { total: v('cko-total'), avg: v('cko-avg') };
+  Object.keys(o).forEach(k => { if (!o[k]) delete o[k]; });
+  localStorage.setItem('initium_closed_overrides', JSON.stringify(o));
+  localStorage.setItem('initium_lastsaved', new Date().toLocaleTimeString());
+  toast('KPI overrides saved ✓', 'success');
+}
+function clearClosedOverrides() {
+  if (!confirm('Clear all KPI overrides? The live site will revert to auto-calculated values.')) return;
+  localStorage.removeItem('initium_closed_overrides');
+  ['cko-total','cko-avg'].forEach(id => { const e=document.getElementById(id); if(e) e.value=''; });
+  toast('Overrides cleared — using auto-calc', 'info');
+}
+
+/* ═══════════════════ LAUNCH SITE (duplicate definition removed) ═══════════════════ */
+</script>
+</body>
+</html>
