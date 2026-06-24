@@ -9,7 +9,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#020208">
 <meta name="format-detection" content="telephone=no">
-<title>Initium Asset Management</title>
+<title>Initium Asset Management | Research-Driven Investing</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
@@ -1278,14 +1278,14 @@ img[loading]{transition:opacity .6s var(--ease);}
 
   <section class="hero">
     <div class="hero-glow"></div>
-    <div class="hero-eyebrow"><span class="dash"></span>Research-Driven Alpha<span class="dash"></span></div>
+    <div class="hero-eyebrow"><span class="dash"></span>Initium Asset Management<span class="dash"></span></div>
     <h1 class="hero-h1">
-      Identifying <em>Mispriced</em><br>Opportunities in <em>Public Markets</em>
+      Making <em>Your</em><br>Capital <em>Matter</em>
     </h1>
     <p class="hero-sub">Research-driven investing focused on asymmetric opportunities, disciplined risk management, and long-term value creation.</p>
     <div class="hero-ctas">
 
-      <button class="btn-g" onclick="go('about')">Our Investment Thesis</button>
+      <button class="btn-g" onclick="go('about')">Explore Portfolio</button>
     </div>
     <div class="scroll-cue"><span>Scroll</span><div class="scroll-line"></div></div>
     <div class="hero-chart">
@@ -1310,7 +1310,7 @@ img[loading]{transition:opacity .6s var(--ease);}
         <circle cx="620" cy="70" r="5" fill="#E8C96B" class="chart-fill chart-dot" style="filter:drop-shadow(0 0 8px #E8C96B)"/>
         <circle cx="1000" cy="10" r="6" fill="#4DFFEF" class="chart-fill chart-dot" style="filter:drop-shadow(0 0 12px #4DFFEF)"/>
         <text x="12" y="216" fill="rgba(82,80,106,.7)" font-size="11" font-family="DM Mono">Q1 2023</text>
-        <text x="600" y="64" fill="rgba(232,201,107,.8)" font-size="11" font-family="DM Mono" class="chart-fill">+68%</text>
+        <text x="600" y="64" fill="rgba(232,201,107,.8)" font-size="11" font-family="DM Mono" class="chart-fill">+25%</text>
         <text x="900" y="216" fill="rgba(82,80,106,.7)" font-size="11" font-family="DM Mono">Q1 2026</text>
       </svg>
     </div>
@@ -1321,24 +1321,24 @@ img[loading]{transition:opacity .6s var(--ease);}
     <div class="container">
       <div class="stats-grid rv">
         <div class="stat-block">
-          <span class="stat-num" data-target="347" data-suffix="%">0%</span>
-          <div class="stat-lbl">Portfolio Return 3yr</div>
+          <span class="stat-num" data-target="25" data-suffix="%">0%</span>
+          <div class="stat-lbl">Portfolio Return (1yr)</div>
         </div>
         <div class="stat-block">
-          <span class="stat-num" data-target="8" data-suffix="">0</span>
-          <div class="stat-lbl">Active Positions</div>
+          <span class="stat-num" data-target="25" data-suffix="%">0%</span>
+          <div class="stat-lbl">Portfolio Return (Since Inception 2025/26)</div>
         </div>
         <div class="stat-block">
           <span class="stat-num" data-target="100" data-suffix="%">0%</span>
           <div class="stat-lbl">Independent Research</div>
         </div>
         <div class="stat-block">
-          <span class="stat-num" data-target="24" data-suffix="×">0×</span>
-          <div class="stat-lbl">Avg Upside / Downside</div>
+          <span class="stat-num" data-target="15" data-suffix="">0</span>
+          <div class="stat-lbl">Active Positions</div>
         </div>
         <div class="stat-block">
-          <span class="stat-num" data-target="0" data-suffix="">0</span>
-          <div class="stat-lbl">Benchmark Mandates</div>
+          <span class="stat-num" data-target="6" data-suffix="">0</span>
+          <div class="stat-lbl">Global Exchanges</div>
         </div>
       </div>
     </div>
@@ -1642,7 +1642,7 @@ img[loading]{transition:opacity .6s var(--ease);}
       <div><div class="fc-h">Navigate</div><ul class="fc-links"><li><a onclick="go('home')">Home</a></li><li><a onclick="go('research')">Research</a></li><li><a onclick="go('about')">About</a></li><li><a onclick="go('contact')">Contact</a></li></ul></div>
       <div><div class="fc-h">Research</div><ul class="fc-links"><li><a onclick="go('research')">Equity Research</a></li><li><a onclick="go('research')">Macro Analysis</a></li><li><a onclick="go('research')">Risk Framework</a></li><li><a onclick="go('research')">Investment Theses</a></li></ul></div>
       <div>
-        <div class="fc-h">Legal</div><ul class="fc-links"><li><a>Privacy Policy</a></li><li><a>Terms of Service</a></li><li><a>Disclaimer</a></li></ul>
+        <div class="fc-h">Legal</div><ul class="fc-links"><li><a onclick="openLegal('privacy')">Privacy Policy</a></li><li><a onclick="openLegal('terms')">Terms of Service</a></li><li><a onclick="openLegal('disclaimer')">Disclaimer</a></li></ul>
         <div style="margin-top:2rem;"><div class="fc-h">Contact</div><p style="font-size:.83rem;color:var(--muted2);" id="footer-email"><a href="mailto:contact@initiumtrust.com" style="color:inherit;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='inherit'">contact@initiumtrust.com</a></p></div>
       </div>
     </div>
@@ -2722,6 +2722,106 @@ ti.innerHTML = th;
 
 <button id="to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top" title="Back to top">↑</button>
 <div id="toast" role="status" aria-live="polite"></div>
+
+
+<!-- ╔══════════════════════════════════╗ -->
+<!-- ║         LEGAL MODALS             ║ -->
+<!-- ╚══════════════════════════════════╝ -->
+<div class="modal-bg" id="legal-modal">
+  <div class="modal-box" style="max-width:680px;max-height:80vh;overflow-y:auto;">
+    <button class="modal-close" onclick="closeLegal()">✕</button>
+    <div id="legal-content"></div>
+  </div>
+</div>
+
+<script>
+const LEGAL_CONTENT = {
+  privacy: {
+    title: 'Privacy Policy',
+    icon: '◎',
+    lastUpdated: 'June 2026',
+    sections: [
+      { heading: 'Overview', body: 'Initium Asset Management Ltd ("Initium", "we", "us") respects your privacy and is committed to protecting any personal information you share with us. This Privacy Policy explains how we collect, use, and safeguard information when you visit our website or contact us directly.' },
+      { heading: 'Information We Collect', body: 'We may collect personal information that you voluntarily provide when submitting an access request or contact form. This may include your name, email address, and any information included in your message. We do not collect payment data, financial information, or sensitive personal data through this website.' },
+      { heading: 'How We Use Your Information', body: 'Information submitted via our contact or access request forms is used solely to respond to your enquiry and, where applicable, to evaluate your suitability for access to our research. We do not use your information for marketing purposes without your explicit consent, and we do not sell or rent personal data to third parties.' },
+      { heading: 'Data Storage & Security', body: 'Any personal data collected is stored securely and accessed only by authorised personnel of Initium. We implement appropriate technical and organisational measures to protect your information against unauthorised access, alteration, or disclosure. We retain personal data only for as long as necessary to fulfil the purpose for which it was collected.' },
+      { heading: 'Cookies', body: 'This website does not use tracking cookies or third-party analytics tools. We may use session-based browser storage (localStorage) solely to preserve your interface preferences within a single visit. No personally identifiable information is stored in browser storage.' },
+      { heading: 'Third-Party Links', body: 'Our website may contain links to external sites. We are not responsible for the privacy practices or content of those sites and encourage you to review their privacy policies independently.' },
+      { heading: 'Your Rights', body: 'You have the right to request access to, correction of, or deletion of any personal information we hold about you. To exercise these rights, please contact us at contact@initiumtrust.com. We will respond to all legitimate requests within 30 days.' },
+      { heading: 'Changes to This Policy', body: 'We reserve the right to update this Privacy Policy at any time. Changes will be posted on this page with an updated effective date. Continued use of this website following any changes constitutes your acceptance of the revised policy.' },
+      { heading: 'Contact', body: 'For any privacy-related queries, please contact us at: contact@initiumtrust.com' }
+    ]
+  },
+  terms: {
+    title: 'Terms of Service',
+    icon: '◈',
+    lastUpdated: 'June 2026',
+    sections: [
+      { heading: 'Acceptance of Terms', body: 'By accessing and using this website, you accept and agree to be bound by these Terms of Service. If you do not agree with any part of these terms, you must not use this website. These terms apply to all visitors, users, and others who access or use the site.' },
+      { heading: 'Nature of the Website', body: 'This website is operated by Initium Asset Management Ltd, a Cyprus-registered proprietary investment company. The content published here reflects our own research and analysis conducted exclusively in relation to our proprietary capital. This website does not constitute an offer, solicitation, or invitation to invest, nor does it represent regulated financial advice.' },
+      { heading: 'Access & Subscriptions', body: 'Certain sections of this website are restricted to approved subscribers. Access codes are issued at our sole discretion and are non-transferable. Initium reserves the right to revoke access at any time without notice. Subscription access is provided for informational purposes only.' },
+      { heading: 'Intellectual Property', body: 'All content on this website — including research articles, analysis, graphics, layout, and written material — is the intellectual property of Initium Asset Management Ltd and is protected by applicable copyright laws. You may not reproduce, distribute, or create derivative works from any content without our prior written consent.' },
+      { heading: 'Prohibited Use', body: 'You agree not to use this website for any unlawful purpose, to transmit any harmful or malicious content, to attempt to gain unauthorised access to any part of the site, or to use any automated tools to scrape or harvest content. Violation of these terms may result in immediate termination of your access.' },
+      { heading: 'Limitation of Liability', body: 'To the fullest extent permitted by applicable law, Initium Asset Management Ltd shall not be liable for any direct, indirect, incidental, consequential, or punitive damages arising from your use of, or inability to use, this website or its content. All content is provided on an "as is" basis without warranties of any kind.' },
+      { heading: 'Governing Law', body: 'These Terms of Service are governed by and construed in accordance with the laws of the Republic of Cyprus. Any disputes arising in connection with these terms shall be subject to the exclusive jurisdiction of the courts of Cyprus.' },
+      { heading: 'Modifications', body: 'Initium reserves the right to modify these Terms of Service at any time. Updated terms will be posted on this page. Your continued use of the website after any changes constitutes your acceptance of the new terms.' },
+      { heading: 'Contact', body: 'For questions regarding these Terms of Service, please contact: contact@initiumtrust.com' }
+    ]
+  },
+  disclaimer: {
+    title: 'Disclaimer',
+    icon: '⬡',
+    lastUpdated: 'June 2026',
+    sections: [
+      { heading: 'Not Investment Advice', body: 'All content published on this website, including research articles, market analysis, portfolio information, and commentary, is provided for informational purposes only. Nothing on this site constitutes investment advice, a recommendation, or a solicitation to buy or sell any financial instrument or security.' },
+      { heading: 'No Regulated Activity', body: 'Initium Asset Management Ltd is not regulated by the Cyprus Securities and Exchange Commission (CySEC) or any other financial regulatory authority. We do not hold any licence to provide investment advice, portfolio management services, or any other regulated financial service to third parties. All investment activity described on this site relates exclusively to our own proprietary capital.' },
+      { heading: 'Forward-Looking Statements', body: 'Certain statements, estimates, and projections contained on this website may be forward-looking in nature. These involve known and unknown risks and uncertainties that could cause actual results to differ materially from those expressed or implied. Past performance is not indicative of future results. No representation is made that any investment strategy or analysis will or is likely to achieve profits or losses similar to those discussed.' },
+      { heading: 'Research Accuracy', body: 'While we endeavour to ensure the accuracy and timeliness of the information presented, Initium Asset Management Ltd makes no representations or warranties — express or implied — as to the completeness, accuracy, or reliability of any content. Information may be subject to change without notice, and we are under no obligation to update it.' },
+      { heading: 'Independent Verification', body: 'You should not rely solely on the information contained on this website when making any investment or financial decision. We strongly recommend that you conduct your own independent research and, where appropriate, consult a qualified and regulated financial adviser before making any investment decision.' },
+      { heading: 'Market Risk', body: 'Investing in financial markets involves significant risk, including the possible loss of the entire amount invested. The value of investments can go down as well as up. Currency fluctuations, geopolitical events, and market volatility may all affect investment outcomes in ways that are difficult to predict.' },
+      { heading: 'Third-Party Information', body: 'Where this website references data, analysis, or commentary from third-party sources, such information is provided for context only. Initium does not endorse, verify, or take responsibility for the accuracy or completeness of third-party content.' },
+      { heading: 'Jurisdiction', body: 'This website and its content are intended for general informational use only. Access to this site from jurisdictions where the publication or availability of such content may be restricted or unlawful is prohibited. It is your responsibility to comply with applicable local laws.' }
+    ]
+  }
+};
+
+function openLegal(key) {
+  const data = LEGAL_CONTENT[key];
+  if (!data) return;
+  let inner = `
+    <div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:1.5rem;">
+      <span style="font-size:1.8rem;opacity:.25;">${data.icon}</span>
+      <div>
+        <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:4px;">Initium Asset Management</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--cream);">${data.title}</div>
+      </div>
+    </div>
+    <div style="font-size:.75rem;color:var(--muted);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);">
+      Last updated: ${data.lastUpdated} &nbsp;·&nbsp; Initium Asset Management Ltd &nbsp;·&nbsp; Cyprus
+    </div>`;
+  data.sections.forEach(s => {
+    inner += `
+      <div style="margin-bottom:2rem;">
+        <div style="font-size:8px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:.6rem;">${s.heading}</div>
+        <p style="font-size:.84rem;color:var(--muted2);line-height:1.85;">${s.body}</p>
+      </div>`;
+  });
+  inner += `
+    <div style="margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--border);font-size:.75rem;color:var(--muted);line-height:1.7;">
+      © 2026 Initium Asset Management Ltd. All rights reserved. Registered in Cyprus.
+    </div>`;
+  document.getElementById('legal-content').innerHTML = inner;
+  document.getElementById('legal-modal').classList.add('open');
+}
+
+function closeLegal() {
+  document.getElementById('legal-modal').classList.remove('open');
+}
+
+document.getElementById('legal-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeLegal();
+});
+</script>
 
 </body>
 </html>
