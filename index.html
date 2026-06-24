@@ -2543,20 +2543,45 @@ document.getElementById('modal').addEventListener('click', e => { if(e.target===
 
 /* ══════════ FORM SUBMIT ══════════ */
 async function submitForm(btn, okId) {
-  const notif = loadLS('notifications', {});
+  const FORMSPREE_URL = 'https://formspree.io/f/mwvdvvpr';
   const isC = okId === 'c-ok';
-  const url = isC ? notif.contactUrl : notif.accessUrl;
-  const okMsg = isC ? (notif.contactSuccess || '✓ Message sent. We\'ll respond within 2–3 business days.') : (notif.accessSuccess || '✓ Application received. We\'ll review within 2–3 business days.');
+  const okMsg = isC
+    ? '✓ Message sent. We\'ll respond within 2–3 business days.'
+    : '✓ Application received. We\'ll review your request within 2–3 business days.';
+
+  // Collect all form fields near the button
+  const form = btn.closest('section') || btn.parentElement;
+  const inputs = form ? form.querySelectorAll('input, select, textarea') : [];
+  const formData = {};
+  inputs.forEach(el => {
+    const key = el.name || el.placeholder || el.type || 'field';
+    if (el.value) formData[key] = el.value;
+  });
+  formData['_subject'] = isC ? 'Initium — New Contact Message' : 'Initium — New Access Request';
+  formData['form_type'] = isC ? 'Contact Form' : 'Access Request Form';
+
   btn.textContent = 'Sending…';
   btn.disabled = true;
-  if (url) {
-    try {
-      const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify({_subject:isC?'Initium Contact':'Initium Access Request'}) });
-      if (res.ok) { btn.textContent = '✓ Sent'; btn.style.background = 'var(--green)'; const e = document.getElementById(okId); if(e){e.textContent=okMsg;e.style.display='block';} }
-      else throw new Error();
-    } catch { btn.textContent = '✕ Failed'; btn.style.background = 'var(--red)'; btn.disabled = false; }
-  } else {
-    setTimeout(() => { btn.textContent = '✓ Submitted'; btn.style.background = 'var(--green)'; const e = document.getElementById(okId); if(e) e.style.display = 'block'; }, 1200);
+
+  try {
+    const res = await fetch(FORMSPREE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(formData)
+    });
+    if (res.ok) {
+      btn.textContent = '✓ Sent';
+      btn.style.background = 'var(--green)';
+      btn.style.color = 'var(--bg)';
+      const okEl = document.getElementById(okId);
+      if (okEl) { okEl.textContent = okMsg; okEl.style.display = 'block'; }
+    } else {
+      throw new Error('Server error');
+    }
+  } catch(e) {
+    btn.textContent = '✕ Failed — please email us directly';
+    btn.style.background = 'var(--red)';
+    btn.disabled = false;
   }
 }
 
