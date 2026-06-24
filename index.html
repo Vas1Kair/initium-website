@@ -1456,13 +1456,13 @@ img[loading]{transition:opacity .6s var(--ease);}
       </div>
       <div class="form-wrap rv">
         <div class="frow c2">
-          <div class="fg"><label class="fl">First Name *</label><input class="fi" type="text" placeholder="Alexander"></div>
-          <div class="fg"><label class="fl">Last Name *</label><input class="fi" type="text" placeholder="Hamilton"></div>
+          <div class="fg"><label class="fl">First Name *</label><input class="fi" type="text" name="first_name" placeholder="Alexander"></div>
+          <div class="fg"><label class="fl">Last Name *</label><input class="fi" type="text" name="last_name" placeholder="Hamilton"></div>
         </div>
-        <div class="fg" style="margin-bottom:1rem;"><label class="fl">Institutional Email *</label><input class="fi" type="email" placeholder="a.hamilton@institution.com"></div>
+        <div class="fg" style="margin-bottom:1rem;"><label class="fl">Institutional Email *</label><input class="fi" type="email" name="email" placeholder="a.hamilton@institution.com"></div>
         <div class="fg" style="margin-bottom:1rem;">
           <label class="fl">Investment Background *</label>
-          <select class="fi">
+          <select class="fi" name="investment_background">
             <option value="" disabled selected>Select your background</option>
             <option>Institutional Investor (5+ years)</option>
             <option>Family Office / HNW Individual</option>
@@ -1470,7 +1470,7 @@ img[loading]{transition:opacity .6s var(--ease);}
             <option>Independent Investor (3+ years)</option>
           </select>
         </div>
-        <div class="fg" style="margin-bottom:1.5rem;"><label class="fl">Message (Optional)</label><textarea class="fi" style="resize:vertical;min-height:90px;" placeholder="Tell us about your investment background..."></textarea></div>
+        <div class="fg" style="margin-bottom:1.5rem;"><label class="fl">Message (Optional)</label><textarea class="fi" name="message" style="resize:vertical;min-height:90px;" placeholder="Tell us about your investment background..."></textarea></div>
         <p style="font-size:.75rem;color:var(--muted);margin-bottom:1rem;line-height:1.6;">By submitting you confirm you are a qualified investor and agree to our Terms.</p>
         <button class="btn-p holo" style="width:100%;" onclick="submitForm(this,'home-ok')">Submit Application</button>
         <div class="f-ok" id="home-ok">✓ Application received. We'll review your request within 2–3 business days.</div>
@@ -1605,22 +1605,25 @@ img[loading]{transition:opacity .6s var(--ease);}
         <div class="rv-r">
           <div class="eyebrow">Send a Message</div>
           <h2 class="s-title" style="margin-bottom:2rem;">Write to <em>Us</em></h2>
+          <form id="contact-form" onsubmit="submitFormEl(event,'contact-form','c-ok','contact-btn')">
+          <input type="hidden" name="_subject" value="Initium — New Contact Message">
           <div class="frow c2">
-            <div class="fg"><label class="fl">First Name *</label><input class="fi" type="text" placeholder="First name"></div>
-            <div class="fg"><label class="fl">Last Name *</label><input class="fi" type="text" placeholder="Last name"></div>
+            <div class="fg"><label class="fl">First Name *</label><input class="fi" type="text" name="first_name" placeholder="First name" required></div>
+            <div class="fg"><label class="fl">Last Name *</label><input class="fi" type="text" name="last_name" placeholder="Last name" required></div>
           </div>
-          <div class="fg" style="margin-bottom:1rem;"><label class="fl">Email *</label><input class="fi" type="email" placeholder="your@email.com"></div>
+          <div class="fg" style="margin-bottom:1rem;"><label class="fl">Email *</label><input class="fi" type="email" name="email" placeholder="your@email.com" required></div>
           <div class="fg" style="margin-bottom:1rem;">
             <label class="fl">Subject</label>
-            <select class="fi">
+            <select class="fi" name="subject">
               <option disabled selected>Select a subject</option>
               <option>Subscription Enquiry</option><option>Research Question</option>
               <option>Institutional Access</option><option>General Enquiry</option>
             </select>
           </div>
-          <div class="fg" style="margin-bottom:1.5rem;"><label class="fl">Message *</label><textarea class="fi" style="resize:vertical;min-height:130px;" placeholder="Your message..."></textarea></div>
-          <button class="btn-p holo" style="width:100%;" onclick="submitForm(this,'c-ok')">Send Message</button>
+          <div class="fg" style="margin-bottom:1.5rem;"><label class="fl">Message *</label><textarea class="fi" name="message" style="resize:vertical;min-height:130px;" placeholder="Your message..." required></textarea></div>
+          <button id="contact-btn" class="btn-p holo" style="width:100%;" type="submit">Send Message</button>
           <div class="f-ok" id="c-ok">✓ Message sent. We'll respond within 2–3 business days.</div>
+          </form>
         </div>
       </div>
     </div>
@@ -1661,7 +1664,7 @@ img[loading]{transition:opacity .6s var(--ease);}
     <div class="modal-icon">◈</div>
     <div class="modal-title">Member Login</div>
     <p class="modal-sub">Access is restricted to approved subscribers. Log in with your credentials or apply for a subscription.</p>
-    <div class="fg" style="margin-bottom:1rem;"><label class="fl">Email Address</label><input class="fi" type="email" placeholder="your@email.com"></div>
+    <div class="fg" style="margin-bottom:1rem;"><label class="fl">Email Address</label><input class="fi" type="email" name="email" placeholder="your@email.com"></div>
     <div class="fg" style="margin-bottom:1.8rem;"><label class="fl">Password</label><input class="fi" type="password" placeholder="••••••••"></div>
     <button class="btn-p holo" style="width:100%;margin-bottom:.8rem;" onclick="closeModal()">Log In</button>
     <button class="btn-g" style="width:100%;" onclick="closeModal();go('contact')">Contact Us →</button>
@@ -2542,6 +2545,41 @@ function closeModal() { document.getElementById('modal').classList.remove('open'
 document.getElementById('modal').addEventListener('click', e => { if(e.target===document.getElementById('modal')) closeModal(); });
 
 /* ══════════ FORM SUBMIT ══════════ */
+async function submitFormEl(event, formId, okId, btnId) {
+  event.preventDefault();
+  const FORMSPREE_URL = 'https://formspree.io/f/mwvdvvpr';
+  const form = document.getElementById(formId);
+  const btn = document.getElementById(btnId);
+  const data = new FormData(form);
+  const json = {};
+  data.forEach((v, k) => { json[k] = v; });
+
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(FORMSPREE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(json)
+    });
+    if (res.ok) {
+      btn.textContent = 'Sent';
+      btn.style.background = 'var(--green)';
+      btn.style.color = 'var(--bg)';
+      const okEl = document.getElementById(okId);
+      if (okEl) { okEl.textContent = 'Message sent. We will respond within 2-3 business days.'; okEl.style.display = 'block'; }
+      form.reset();
+    } else {
+      throw new Error('fail');
+    }
+  } catch(e) {
+    btn.textContent = 'Failed - please email us directly';
+    btn.style.background = 'var(--red)';
+    btn.disabled = false;
+  }
+}
+
 async function submitForm(btn, okId) {
   const FORMSPREE_URL = 'https://formspree.io/f/mwvdvvpr';
   const isC = okId === 'c-ok';
