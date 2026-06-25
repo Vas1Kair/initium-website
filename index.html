@@ -2638,72 +2638,19 @@ async function submitForm(btn, okId) {
 }
 
 /* ══════════ TICKER ══════════ */
-/* ══════════ LIVE TICKER VIA RENDER BACKEND ══════════ */
-const TICKER_API = 'https://price-api-gn0s.onrender.com/ticker';
-
-const FALLBACK_TICKERS = [
-  {sym:'NVDA',price:'—',chg:'—',pos:true},
-  {sym:'META',price:'—',chg:'—',pos:true},
-  {sym:'MSFT',price:'—',chg:'—',pos:true},
-  {sym:'AMZN',price:'—',chg:'—',pos:true},
-  {sym:'ASML',price:'—',chg:'—',pos:true},
-  {sym:'TSM', price:'—',chg:'—',pos:true},
-  {sym:'BABA',price:'—',chg:'—',pos:true},
-  {sym:'ORCL',price:'—',chg:'—',pos:true},
-  {sym:'NFLX',price:'—',chg:'—',pos:true},
-  {sym:'UBER',price:'—',chg:'—',pos:true},
-  {sym:'PANW',price:'—',chg:'—',pos:true},
-  {sym:'UBS', price:'—',chg:'—',pos:true},
-  {sym:'AMD', price:'—',chg:'—',pos:true},
-  {sym:'AAPL',price:'—',chg:'—',pos:true},
-  {sym:'GOOGL',price:'—',chg:'—',pos:true},
-];
-
-let liveTickerData = FALLBACK_TICKERS.map(t => ({...t}));
-
-function renderTicker() {
-  const ti = document.getElementById('ticker-inner');
-  if (!ti) return;
-  let th = '';
-  const doubled = [...liveTickerData, ...liveTickerData];
-  doubled.forEach(t => {
-    const chgStr = t.chg !== '—' ? ((t.pos ? '+' : '') + t.chg + '%') : '—';
-    const priceStr = t.price !== '—' ? '$' + t.price : '—';
-    th += `<span class="t-item">
-      <span class="t-sym">${t.sym}</span>
-      <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted2);margin:0 4px;">${priceStr}</span>
-      <span class="${t.pos ? 't-pos' : 't-neg'}">${chgStr}</span>
-    </span>`;
-  });
-  ti.innerHTML = th;
-}
-
-async function fetchTickerPrices() {
-  try {
-    const res = await fetch(TICKER_API);
-    if (!res.ok) throw new Error('Server error ' + res.status);
-    const data = await res.json();
-    if (data.success && Array.isArray(data.ticker) && data.ticker.length > 0) {
-      liveTickerData = data.ticker.map(t => ({
-        sym:   t.sym,
-        price: t.price,
-        chg:   Math.abs(t.chg),
-        pos:   t.pos
-      }));
-      renderTicker();
-      console.log('[Initium Ticker] Live prices loaded:', liveTickerData.length, 'symbols');
-    }
-  } catch(e) {
-    console.warn('[Initium Ticker] Could not reach backend:', e.message);
-  }
-}
-
-// Initial render with placeholders, then fetch live
-renderTicker();
-fetchTickerPrices();
-
-// Refresh every 60 seconds
-setInterval(fetchTickerPrices, 60000);
+const TICKERS = loadLS('tickers', [
+  {sym:'NVDA',chg:'+4.12%',pos:true},{sym:'META',chg:'+2.87%',pos:true},{sym:'TSM',chg:'+1.54%',pos:true},
+  {sym:'ASML',chg:'-0.38%',pos:false},{sym:'MSFT',chg:'+0.91%',pos:true},{sym:'BRKB',chg:'+0.22%',pos:true},
+  {sym:'AMZN',chg:'+1.67%',pos:true},{sym:'BABA',chg:'-1.12%',pos:false},{sym:'S&P500',chg:'+0.84%',pos:true},
+  {sym:'NASDAQ',chg:'+1.23%',pos:true},{sym:'DAX',chg:'+0.54%',pos:true},{sym:'NIKKEI',chg:'-0.21%',pos:false},
+  {sym:'FTSE',chg:'+0.33%',pos:true},{sym:'HANG SENG',chg:'-0.67%',pos:false},{sym:'GOLD',chg:'+0.18%',pos:true},
+]);
+const ti = document.getElementById('ticker-inner');
+let th = '';
+[...TICKERS,...TICKERS].forEach(t => {
+  th += `<span class="t-item"><span class="t-sym">${t.sym}</span><span class="${t.pos?'t-pos':'t-neg'}">${t.chg}</span></span>`;
+});
+ti.innerHTML = th;
 
 /* ════════════════════════════════════════════════════════════════
    CRAFT PASS — INTERACTION LAYER
