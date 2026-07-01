@@ -1263,7 +1263,6 @@ img[loading]{transition:opacity .6s var(--ease);}
     <div id="nav-ind"></div>
   </ul>
   <div style="display:flex;align-items:center;gap:1rem;">
-    <button class="btn-login" onclick="openModal()"><span>Log In</span></button>
     <button class="nav-burger" id="nav-burger" aria-label="Open menu" aria-expanded="false" onclick="toggleMobileMenu()">
       <span></span><span></span><span></span>
     </button>
@@ -1277,7 +1276,7 @@ img[loading]{transition:opacity .6s var(--ease);}
   <a id="mm-about" onclick="mobileGo('about')">About</a>
   <a id="mm-contact" onclick="mobileGo('contact')">Contact</a>
   <div class="mm-rule"></div>
-  <a onclick="toggleMobileMenu();openModal()" style="font-size:1rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);">Log In →</a>
+
 </div>
 
 <!-- ╔══════════════════════════════════╗ -->
@@ -1299,7 +1298,7 @@ img[loading]{transition:opacity .6s var(--ease);}
     <p class="hero-sub">Research-driven investing focused on asymmetric opportunities, disciplined risk management, and long-term value creation.</p>
     <div class="hero-ctas">
 
-      <button class="btn-g" onclick="go('about')">Explore Portfolio</button>
+      <button class="btn-g" onclick="go('about')">Investment Philosophy</button>
     </div>
     <div class="scroll-cue"><span>Scroll</span><div class="scroll-line"></div></div>
     <div class="hero-chart">
@@ -1680,7 +1679,7 @@ img[loading]{transition:opacity .6s var(--ease);}
     <p class="modal-sub">Access is restricted to approved subscribers. Log in with your credentials or apply for a subscription.</p>
     <div class="fg" style="margin-bottom:1rem;"><label class="fl">Email Address</label><input class="fi" type="email" name="email" placeholder="your@email.com"></div>
     <div class="fg" style="margin-bottom:1.8rem;"><label class="fl">Password</label><input class="fi" type="password" placeholder="••••••••"></div>
-    <button class="btn-p holo" style="width:100%;margin-bottom:.8rem;" onclick="closeModal()">Log In</button>
+    
     <button class="btn-g" style="width:100%;" onclick="closeModal();go('contact')">Contact Us →</button>
   </div>
 </div>
